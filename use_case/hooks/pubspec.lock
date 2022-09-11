@@ -139,7 +139,7 @@ packages:
     description:
       path: template_utils
       ref: main
-      resolved-ref: f02fcf796542efc5f60bafa341f6008ba4614b6f
+      resolved-ref: c78f1690bc2f56d5a3c3c3cad0ebffc17197e5fb
       url: "https://github.com/andrzejchm/flutter-clean-arch-templates.git"
     source: git
     version: "1.0.0"

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:async/async.dart';
 import 'package:mason/mason.dart';
 import 'package:path/path.dart' as path_lib;
 import 'package:recase/recase.dart';
@@ -13,6 +14,22 @@ extension FileUtils on File {
   String get fileNameWithoutExtension => fileNameWithExtension.removedFileExtension;
 
   String relativePathTo(String path) => this.absolute.path.relativePathTo(path);
+}
+
+/// all dart files in lib and test directories
+Stream<File> allProjectDartFiles({required String rootDir}) {
+  return StreamGroup.merge([
+    allFilesInDir(rootDir.libDir),
+    allFilesInDir(rootDir.testDir),
+  ]).where((event) => event.path.endsWith(".dart"));
+}
+
+/// all files in given [path] and subdirectories
+Stream<File> allFilesInDir(String path) {
+  return Directory(path)
+      .list(recursive: true) //
+      .where((event) => event is File)
+      .map((event) => event as File);
 }
 
 extension StringUtils on String {
@@ -32,6 +49,18 @@ extension StringUtils on String {
     }
   }
 
+  String importPath(String rootPath, {required String appPackage}) {
+    if (contains(rootPath.libDir)) {
+      return "$appPackage/${rootPath.libDir.relativePathTo(this)}";
+    } else if (contains(rootPath.testDir)) {
+      return "$appPackage/${rootPath.testDir.relativePathTo(this)}";
+    } else {
+      throw "'$this' is not inside either lib or test folder";
+    }
+  }
+
+  String get classNameFromFile => File(this).fileNameWithoutExtension.pascalCase;
+
   String get libDir => path_lib.join(projectRootDir(this), "lib");
 
   String get testDir => path_lib.join(projectRootDir(this), "test");
@@ -40,7 +69,7 @@ extension StringUtils on String {
 
   String get featureName {
     var absolute = path_lib.absolute(this);
-    return absolute.contains("lib/features") ? RegExp("lib/features/(.+)/").firstMatch(absolute)?.group(1) ?? "" : "";
+    return absolute.contains("lib/features") ? RegExp("lib/features/(.+?)/").firstMatch(absolute)?.group(1) ?? "" : "";
   }
 
   String relativePathTo(String path) {
@@ -93,7 +122,7 @@ Future<void> ensureFeatureComponentFile({
   if (!await featureFile.exists()) {
     await featureFile.create(recursive: true);
     await writeToFile(filePath: featureFile.path, text: featureComponentTemplate(appPackage));
-    await multiReplaceAllInFile(
+    await replaceAllInFileLineByLine(
       filePath: coreFile.path,
       replacements: [
         StringReplacement.prepend(
@@ -102,7 +131,7 @@ Future<void> ensureFeatureComponentFile({
         ),
       ],
     );
-    await multiReplaceAllInFile(
+    await replaceAllInFileLineByLine(
       filePath: coreFile.path,
       replacements: [
         StringReplacement.prepend(
@@ -156,7 +185,7 @@ Future<void> ensureMocksFile({
   if (!await featureFile.exists()) {
     await featureFile.create(recursive: true);
     await writeToFile(filePath: featureFile.path, text: featureMocksTemplate(feature!));
-    await multiReplaceAllInFile(
+    await replaceAllInFileLineByLine(
       filePath: coreFile.path,
       replacements: [
         StringReplacement.prepend(
@@ -165,7 +194,7 @@ Future<void> ensureMocksFile({
         ),
       ],
     );
-    await multiReplaceAllInFile(
+    await replaceAllInFileLineByLine(
       filePath: coreFile.path,
       replacements: [
         StringReplacement.prepend(
@@ -189,13 +218,49 @@ Future<void> _ensurePageTestConfigFile(String? feature) async {
   }
 }
 
+/// Replaces given text in file reading it at once and not line-by-line. this allows for multiline regexes to match
+Future<void> replaceAllInFileAtOnce({
+  required String filePath,
+  required List<StringReplacement> replacements,
+}) async {
+  final tmpFilePath = "${filePath}_write_.tmp";
+  final tmpFile = File(tmpFilePath);
+
+  IOSink? writeSink;
+  try {
+    var fileContents = await File(filePath).readAsString();
+    writeSink = tmpFile.openWrite();
+    final foundReplacementsMap = Map.fromEntries(replacements.map((e) => MapEntry(e, false)));
+    for (final rep in replacements) {
+      if (fileContents.contains(rep.from)) {
+        foundReplacementsMap[rep] = true;
+        fileContents = fileContents.replaceAllMapped(rep.from, rep.to);
+      }
+    }
+    writeSink.write(fileContents);
+    final notFoundReplacements =
+        foundReplacementsMap.entries.where((element) => element.key.failIfNotFound && !element.value);
+    if (notFoundReplacements.isNotEmpty) {
+      var notFoundReplacementsList = foundReplacementsMap.entries.map((entry) => entry.key.from).join("\n");
+      throw "couldn't find following replacements: $notFoundReplacementsList\n in file: $filePath";
+    }
+  } catch (ex) {
+    tmpFile.deleteSync();
+    rethrow;
+  } finally {
+    await writeSink?.close();
+  }
+
+  await tmpFile.rename(filePath);
+}
+
 /// performs multiple replacements in single file, convenient method so that you dont have to read file
 /// multiple times to perform replacements.
 ///
 /// replacements are performed line-by-line in the order they were specified in the list
 ///
 /// IMPORTANT: Does not support multiline replacements as all replacements are applied on per-line basis
-Future<void> multiReplaceAllInFile({
+Future<void> replaceAllInFileLineByLine({
   required String filePath,
   required List<StringReplacement> replacements,
 }) async {
@@ -221,7 +286,7 @@ Future<void> multiReplaceAllInFile({
         foundReplacementsMap.entries.where((element) => element.key.failIfNotFound && !element.value);
     if (notFoundReplacements.isNotEmpty) {
       var notFoundReplacementsList = foundReplacementsMap.entries.map((entry) => entry.key.from).join("\n");
-      throw "couldn't find following replacements: $notFoundReplacementsList";
+      throw "couldn't find following replacements: $notFoundReplacementsList\n in file: $filePath";
     }
   } catch (ex) {
     tmpFile.deleteSync();

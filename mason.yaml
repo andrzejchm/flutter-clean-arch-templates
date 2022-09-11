@@ -7,3 +7,5 @@ bricks:
     path: repository
   move_repository:
     path: move_repository
+  move_page:
+    path: move_page

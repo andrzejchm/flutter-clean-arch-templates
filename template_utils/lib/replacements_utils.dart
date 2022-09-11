@@ -11,6 +11,28 @@ String templateImport(String package, {String as = '', bool relative = false}) {
   return "import \"${pkg}\"${asDirective};";
 }
 
+RegExp getItFactoryRegex(String name) {
+  ///whole 'registerFactory' method
+  final group1 = "(\\.+\\s*registerFactory\\w*<$name.*?)";
+
+  ///ending comment '//DO-NOT-REMOVE.*$' or '..' from next registration
+  final group2 = "(\\/\\/\\s*DO.*?\$|\\.\\..*?\$)";
+
+  ///minimal group of chars that are followed by `//DO-NOT-REMOVE.*$` comment
+  final group3 = "(.*(?=\\/\\/\\s*DO-NOT-REMOVE.*?\$))?";
+
+  ///OPTIONAL ending `//DO-NOT-REMOVE.*$` comment
+  final group4 = "(\\/\\/\\s*DO-NOT-REMOVE.*?\$)*";
+
+  ///OPTIONAL minimal group of rest of the chars, just to make sure previous group is matched
+  final group5 = "(.*?)";
+  return RegExp(
+    "$group1$group2$group3$group4$group5\$",
+    dotAll: true,
+    multiLine: true,
+  );
+}
+
 String templateMockStaticField(String typeName) => "static late Mock$typeName ${typeName.camelCase};";
 
 String templateMockFieldInit(String typeName) => "${typeName.camelCase} = Mock$typeName();";
