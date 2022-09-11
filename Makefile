@@ -2,10 +2,10 @@
 package := picnic_app
 file := test/coverage_helper_test.dart
 
-pub_get:
-	for dir in `find . -name "*hooks" -type d` ; do \
-		pushd $$dir ; fvm flutter pub get ; popd ; \
+pub_upgrade:
+	@for dir in `find . -name "*hooks" -type d` ; do \
+		pushd $$dir ; fvm flutter pub upgrade ; popd ; \
 	done
-	pushd template_utils; fvm flutter pub get; popd
+	@pushd template_utils; fvm flutter pub upgrade; popd
 
 
