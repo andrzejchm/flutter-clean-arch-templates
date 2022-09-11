@@ -1,5 +1,4 @@
 import 'package:mason/mason.dart';
-import 'package:recase/recase.dart';
 import 'package:template_utils/template_utils.dart';
 
 Future<void> run(HookContext context) async {
@@ -11,6 +10,7 @@ Future<void> run(HookContext context) async {
     final failureFileName = context.vars["failure_file_name"] as String;
     final appPackage = context.vars["app_package"] as String;
     final feature = context.vars["feature"] as String;
+    final rootDir = context.vars["root_dir"] as String;
 
     context.logger.info("Modifying mock definitions...");
     await _replaceInMockDefinitions(
@@ -22,6 +22,7 @@ Future<void> run(HookContext context) async {
       useCaseFileName: useCaseFileName,
       failureFileName: failureFileName,
       feature: feature,
+      rootDir: rootDir,
     );
 
     context.logger.info("Modifying mocks...");
@@ -30,6 +31,7 @@ Future<void> run(HookContext context) async {
       useCaseName: useCaseName,
       failureName: failureName,
       feature: feature,
+      rootDir: rootDir,
     );
 
     context.logger.info("Modifying feature component...");
@@ -41,6 +43,7 @@ Future<void> run(HookContext context) async {
       failureFileName: failureFileName,
       appPackage: appPackage,
       feature: feature,
+      rootDir: rootDir,
     );
   } catch (ex, stack) {
     context.logger.err("$ex\n$stack");
@@ -55,25 +58,21 @@ Future<void> _replaceInAppComponent({
   required String failureFileName,
   required String appPackage,
   required String feature,
+  required String rootDir,
 }) async {
-  await ensureFeatureComponentFile(appPackage: appPackage, feature: feature);
-  await replaceAllInFile(
-    filePath: featureComponentFilePath(feature),
-    from: "//DO-NOT-REMOVE USE_CASES_GET_IT_CONFIG",
-    to: """
-      ..registerFactory<$useCaseName>(
-          () => const $useCaseName(),
-        )
-        //DO-NOT-REMOVE USE_CASES_GET_IT_CONFIG
-      """,
-  );
-  await replaceAllInFile(
-    filePath: featureComponentFilePath(feature),
-    from: "//DO-NOT-REMOVE APP_COMPONENT_IMPORTS",
-    to: """
-import 'package:$appPackage/$importPath/domain/use_cases/$useCaseFileName';
-//DO-NOT-REMOVE APP_COMPONENT_IMPORTS
-      """,
+  await ensureFeatureComponentFile(appPackage: appPackage, feature: feature, rootDir: rootDir);
+  await multiReplaceAllInFile(
+    filePath: featureComponentFilePath(feature: feature, rootDir: rootDir),
+    replacements: [
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE USE_CASES_GET_IT_CONFIG",
+        text: templateRegisterFactory(implementationName: useCaseName),
+      ),
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE APP_COMPONENT_IMPORTS",
+        text: templateImport("$appPackage/$importPath/domain/use_cases/$useCaseFileName"),
+      ),
+    ],
   );
 }
 
@@ -86,27 +85,27 @@ Future<void> _replaceInMockDefinitions({
   required String failureName,
   required String failureFileName,
   required String feature,
+  required String rootDir,
 }) async {
-  final mockDefinition = (String name) => "class Mock$name extends Mock implements $name {}";
-  await ensureMockDefinitionsFile(feature, context: context);
-  await replaceAllInFile(
-    filePath: mockDefinitionsFilePath(feature),
-    from: "//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS",
-    to: """
-import 'package:$appPackage/$importPath/domain/use_cases/$useCaseFileName';
-import 'package:$appPackage/$importPath/domain/model/$failureFileName';
-//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS
+  await ensureMockDefinitionsFile(feature: feature, context: context, rootDir: rootDir);
+  await multiReplaceAllInFile(
+    filePath: mockDefinitionsFilePath(feature: feature, rootDir: rootDir),
+    replacements: [
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS",
+        text: """
+${templateImport("$appPackage/$importPath/domain/use_cases/$useCaseFileName")}
+${templateImport("$appPackage/$importPath/domain/model/$failureFileName")}
       """,
-  );
-
-  await replaceAllInFile(
-    filePath: mockDefinitionsFilePath(feature),
-    from: "//DO-NOT-REMOVE USE_CASE_MOCK_DEFINITION",
-    to: """
-${mockDefinition(failureName)}
-${mockDefinition(useCaseName)}
-//DO-NOT-REMOVE USE_CASE_MOCK_DEFINITION
+      ),
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE USE_CASE_MOCK_DEFINITION",
+        text: """
+${templateMockClassDefinition(failureName)}
+${templateMockClassDefinition(useCaseName)}
       """,
+      ),
+    ],
   );
 }
 
@@ -115,38 +114,34 @@ Future<void> _replaceInMocks({
   required String useCaseName,
   required String failureName,
   required String feature,
+  required String rootDir,
 }) async {
-  final mockStaticField = (String name) => "static late Mock$name ${name.camelCase};";
-  final mockInit = (String name) => "${name.camelCase} = Mock$name();";
-  final registerFallbackValue = (String name) => "registerFallbackValue(Mock$name());";
+  await ensureMocksFile(feature: feature, rootDir: rootDir);
 
-  await ensureMocksFile(feature);
-
-  await replaceAllInFile(
-    filePath: mocksFilePath(feature),
-    from: "//DO-NOT-REMOVE USE_CASE_MOCKS_STATIC_FIELD",
-    to: """
-        ${mockStaticField(failureName)}
-        ${mockStaticField(useCaseName)}
-        //DO-NOT-REMOVE USE_CASE_MOCKS_STATIC_FIELD
+  await multiReplaceAllInFile(
+    filePath: mocksFilePath(feature: feature, rootDir: rootDir),
+    replacements: [
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE USE_CASE_MOCKS_STATIC_FIELD",
+        text: """
+        ${templateMockStaticField(failureName)}
+        ${templateMockStaticField(useCaseName)}
       """,
-  );
-  await replaceAllInFile(
-    filePath: mocksFilePath(feature),
-    from: "//DO-NOT-REMOVE USE_CASE_INIT_MOCKS",
-    to: """
-        ${mockInit(failureName)}
-        ${mockInit(useCaseName)}
-        //DO-NOT-REMOVE USE_CASE_INIT_MOCKS
+      ),
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE USE_CASE_INIT_MOCKS",
+        text: """
+        ${templateMockFieldInit(failureName)}
+        ${templateMockFieldInit(useCaseName)}
       """,
-  );
-  await replaceAllInFile(
-    filePath: mocksFilePath(feature),
-    from: "//DO-NOT-REMOVE USE_CASE_MOCK_FALLBACK_VALUE",
-    to: """
-        ${registerFallbackValue(failureName)}
-        ${registerFallbackValue(useCaseName)}
-        //DO-NOT-REMOVE USE_CASE_MOCK_FALLBACK_VALUE
+      ),
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE USE_CASE_MOCK_FALLBACK_VALUE",
+        text: """
+        ${templateRegisterFallback(failureName)}
+        ${templateRegisterFallback(useCaseName)}
       """,
+      ),
+    ],
   );
 }

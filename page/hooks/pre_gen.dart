@@ -1,7 +1,9 @@
 import "package:mason/mason.dart";
 import "package:recase/recase.dart";
+import "package:template_utils/template_utils.dart";
 
 Future<void> run(HookContext context) async {
+  final rootDir = projectRootDir(context.vars["root_folder_path"]);
   var pageName = (context.vars["page_name"] as String? ?? "").trim().pascalCase;
   final featureName = (context.vars["feature_name"] as String? ?? "").trim().snakeCase;
   var subdirectory = (context.vars["subdirectory"] as String? ?? "").trim();
@@ -13,7 +15,7 @@ Future<void> run(HookContext context) async {
     throw "Cannot use empty name for feature_name";
   }
 
-  final stem = pageName.replaceAll("Page", "");
+  final stem = pageName.replaceAll(RegExp(r"Page$"), "");
   final featurePath = "features/${featureName}/${subdirectory}" //
       .replaceAll(RegExp("/+"), "/")
       .replaceAll(RegExp("/\$"), "");
@@ -37,13 +39,16 @@ Future<void> run(HookContext context) async {
   final presentationModelFileName = "${stem.snakeCase}_presentation_model.dart";
   final initialParamsFileName = "${stem.snakeCase}_initial_params.dart";
   final navigatorFileName = "${stem.snakeCase}_navigator.dart";
+  final relativeRoot = relativeRootDir(rootDir);
+  final relativeLibFeaturePath = "$relativeRoot/lib/${featurePath}";
+  final relativeTestFeaturePath = "$relativeRoot/test/${featureTestPath}";
 
   context.vars = {
     ...context.vars,
     ...context.vars,
-    "app_package": "picnic_app",
+    "app_package": await getAppPackage(rootDir),
     "import_path": "${featurePath}",
-    "stem": "${stem}",
+    "stem": stem,
     //class names
     "page_name": pageName,
     "presenter_name": presenterName,
@@ -59,14 +64,16 @@ Future<void> run(HookContext context) async {
     "presentation_model_file_name": presentationModelFileName,
     "navigator_file_name": navigatorFileName,
     // absolute paths
-    "page_absolute_path": "../lib/${featurePath}/$pageFileName",
-    "presenter_absolute_path": "../lib/${featurePath}/$presenterFileName",
-    "presentation_model_absolute_path": "../lib/${featurePath}/$presentationModelFileName",
-    "navigator_absolute_path": "../lib/${featurePath}/$navigatorFileName",
-    "initial_params_absolute_path": "../lib/${featurePath}/$initialParamsFileName",
-    "page_test_absolute_path": "../test/${featureTestPath}/pages/$pageTestFileName",
-    "presenter_test_absolute_path": "../test/${featureTestPath}/presenters/$presenterTestFileName",
-    'feature': featureName,
+    "page_absolute_path": "$relativeLibFeaturePath/$pageFileName",
+    "presenter_absolute_path": "$relativeLibFeaturePath/$presenterFileName",
+    "presentation_model_absolute_path": "$relativeLibFeaturePath/$presentationModelFileName",
+    "navigator_absolute_path": "$relativeLibFeaturePath/$navigatorFileName",
+    "initial_params_absolute_path": "$relativeLibFeaturePath/$initialParamsFileName",
+    "page_test_absolute_path": "$relativeTestFeaturePath/pages/$pageTestFileName",
+    "presenter_test_absolute_path": "$relativeTestFeaturePath/presenters/$presenterTestFileName",
+    "feature": featureName,
+    "root_dir": rootDir,
   };
-  context.logger.info("Generating page, variables: ${context.vars}");
+  context.logger
+      .info("Generating page, variables: ${context.vars.entries.map((it) => "${it.key} -> ${it.value}").join("\n")}");
 }

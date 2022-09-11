@@ -1,5 +1,5 @@
 name: repository
-description: A new brick created with the Mason CLI.
+description: Creates repository interface, implementation file and registers it in get_it
 
 # The following defines the version and build number for your brick.
 # A version number is three numbers separated by dots, like 1.2.34
@@ -21,6 +21,11 @@ environment:
 #  * an optional prompt phrase used when asking for the variable
 #  * a list of values (enums only)
 vars:
+  root_folder_path:
+    type: string
+    description: root folder path to project where main pubspec.yaml is located
+    default: /Users/andrzejchm/Developer/project-name
+    prompt: "ABSOLUTE path to project's root directory: "
 
   interface_name:
     type: string

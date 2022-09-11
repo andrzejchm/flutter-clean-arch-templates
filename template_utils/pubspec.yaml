@@ -9,6 +9,8 @@ environment:
 dependencies:
   mason: any
   recase: 4.0.0
+  collection: 1.16.0
+  path: 1.8.2
 
 dev_dependencies:
   lints: 2.0.0

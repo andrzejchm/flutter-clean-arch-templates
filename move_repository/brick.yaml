@@ -21,6 +21,11 @@ environment:
 #  * an optional prompt phrase used when asking for the variable
 #  * a list of values (enums only)
 vars:
+  root_folder_path:
+    type: string
+    description: root folder path to project where main pubspec.yaml is located
+    default: /Users/andrzejchm/Developer/project-name
+    prompt: "ABSOLUTE path to project's root directory: "
 
   interface_path:
     type: string

@@ -8,6 +8,6 @@ dependencies:
     git:
       url: https://github.com/andrzejchm/flutter-clean-arch-templates.git
       path: template_utils
-      ref: master
+      ref: 'main'
   mason: any
   recase: 4.0.0

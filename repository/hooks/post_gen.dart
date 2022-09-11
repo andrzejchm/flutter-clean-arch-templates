@@ -1,5 +1,4 @@
 import 'package:mason/mason.dart';
-import 'package:recase/recase.dart';
 import 'package:template_utils/template_utils.dart';
 
 Future<void> run(HookContext context) async {
@@ -11,6 +10,7 @@ Future<void> run(HookContext context) async {
   final implementationFileName = context.vars["implementation_file_name"] as String;
   final implementationImport = context.vars["implementation_import"] as String;
   final interfaceImport = context.vars["interface_import"] as String;
+  final rootDir = context.vars["root_dir"] as String;
 
   await _replaceInMockDefinitions(
     context: context,
@@ -18,12 +18,14 @@ Future<void> run(HookContext context) async {
     interfaceFileName: interfaceFileName,
     interfaceImport: interfaceImport,
     feature: feature,
+    rootDir: rootDir,
   );
 
   await _replaceInMocks(
     context: context,
     interfaceName: interfaceName,
     feature: feature,
+    rootDir: rootDir,
   );
 
   await _replaceInAppComponent(
@@ -36,6 +38,7 @@ Future<void> run(HookContext context) async {
     implementationImport: implementationImport,
     interfaceImport: interfaceImport,
     feature: feature,
+    rootDir: rootDir,
   );
 }
 
@@ -49,26 +52,26 @@ Future<void> _replaceInAppComponent({
   required String implementationImport,
   required String interfaceImport,
   required String feature,
+  required String rootDir,
 }) async {
-  await ensureFeatureComponentFile(appPackage: appPackage, feature: feature);
-  await replaceAllInFile(
-    filePath: featureComponentFilePath(feature),
-    from: "//DO-NOT-REMOVE REPOSITORIES_GET_IT_CONFIG",
-    to: """
-      ..registerFactory<$interfaceName>(
-          () => const $implementationName(),
-        )
-        //DO-NOT-REMOVE REPOSITORIES_GET_IT_CONFIG
-      """,
+  await ensureFeatureComponentFile(appPackage: appPackage, feature: feature, rootDir: rootDir);
+  await multiReplaceAllInFile(
+    filePath: featureComponentFilePath(feature: feature, rootDir: rootDir),
+    replacements: [
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE REPOSITORIES_GET_IT_CONFIG",
+        text: templateRegisterFactory(interfaceName: interfaceName, implementationName: implementationName),
+      ),
+    ],
   );
-  await replaceAllInFile(
-    filePath: featureComponentFilePath(feature),
-    from: "//DO-NOT-REMOVE APP_COMPONENT_IMPORTS",
-    to: """
-    $implementationImport
-    $interfaceImport
-//DO-NOT-REMOVE APP_COMPONENT_IMPORTS
-      """,
+  await multiReplaceAllInFile(
+    filePath: featureComponentFilePath(feature: feature, rootDir: rootDir),
+    replacements: [
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE APP_COMPONENT_IMPORTS",
+        text: "$implementationImport\n$interfaceImport",
+      ),
+    ],
   );
 }
 
@@ -78,25 +81,27 @@ Future<void> _replaceInMockDefinitions({
   required String interfaceFileName,
   required String interfaceImport,
   required String feature,
+  required String rootDir,
 }) async {
-  final mockDefinition = (String name) => "class Mock$name extends Mock implements $name {}";
-  await ensureMockDefinitionsFile(feature);
-  await replaceAllInFile(
-    filePath: mockDefinitionsFilePath(feature),
-    from: "//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS",
-    to: """
-    $interfaceImport
-//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS
-      """,
+  await ensureMockDefinitionsFile(feature: feature, rootDir: rootDir);
+  await multiReplaceAllInFile(
+    filePath: mockDefinitionsFilePath(feature: feature, rootDir: rootDir),
+    replacements: [
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS",
+        text: interfaceImport,
+      ),
+    ],
   );
 
-  await replaceAllInFile(
-    filePath: mockDefinitionsFilePath(feature),
-    from: "//DO-NOT-REMOVE REPOSITORIES_MOCK_DEFINITION",
-    to: """
-${mockDefinition(interfaceName)}
-//DO-NOT-REMOVE REPOSITORIES_MOCK_DEFINITION
-      """,
+  await multiReplaceAllInFile(
+    filePath: mockDefinitionsFilePath(feature: feature, rootDir: rootDir),
+    replacements: [
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE REPOSITORIES_MOCK_DEFINITION",
+        text: templateMockClassDefinition(interfaceName),
+      ),
+    ],
   );
 }
 
@@ -104,34 +109,34 @@ Future<void> _replaceInMocks({
   required HookContext context,
   required String interfaceName,
   required String feature,
+  required String rootDir,
 }) async {
-  final mockStaticField = (String name) => "static late Mock$name ${name.camelCase};";
-  final mockInit = (String name) => "${name.camelCase} = Mock$name();";
-  final registerFallbackValue = (String name) => "registerFallbackValue(Mock$name());";
-
-  await ensureMocksFile(feature);
-  await replaceAllInFile(
-    filePath: mocksFilePath(feature),
-    from: "//DO-NOT-REMOVE REPOSITORIES_MOCKS_STATIC_FIELD",
-    to: """
-        ${mockStaticField(interfaceName)}
-        //DO-NOT-REMOVE REPOSITORIES_MOCKS_STATIC_FIELD
-      """,
+  await ensureMocksFile(feature: feature, rootDir: rootDir);
+  await multiReplaceAllInFile(
+    filePath: mocksFilePath(feature: feature, rootDir: rootDir),
+    replacements: [
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE REPOSITORIES_MOCKS_STATIC_FIELD",
+        text: templateMockStaticField(interfaceName),
+      ),
+    ],
   );
-  await replaceAllInFile(
-    filePath: mocksFilePath(feature),
-    from: "//DO-NOT-REMOVE REPOSITORIES_INIT_MOCKS",
-    to: """
-        ${mockInit(interfaceName)}
-        //DO-NOT-REMOVE REPOSITORIES_INIT_MOCKS
-      """,
+  await multiReplaceAllInFile(
+    filePath: mocksFilePath(feature: feature, rootDir: rootDir),
+    replacements: [
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE REPOSITORIES_INIT_MOCKS",
+        text: templateMockFieldInit(interfaceName),
+      ),
+    ],
   );
-  await replaceAllInFile(
-    filePath: mocksFilePath(feature),
-    from: "//DO-NOT-REMOVE REPOSITORIES_MOCK_FALLBACK_VALUE",
-    to: """
-        ${registerFallbackValue(interfaceName)}
-        //DO-NOT-REMOVE REPOSITORIES_MOCK_FALLBACK_VALUE
-      """,
+  await multiReplaceAllInFile(
+    filePath: mocksFilePath(feature: feature, rootDir: rootDir),
+    replacements: [
+      StringReplacement.prepend(
+        before: "//DO-NOT-REMOVE REPOSITORIES_MOCK_FALLBACK_VALUE",
+        text: templateRegisterFallback(interfaceName),
+      ),
+    ],
   );
 }

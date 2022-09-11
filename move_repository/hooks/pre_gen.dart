@@ -1,17 +1,18 @@
 import 'dart:io';
 
 import "package:mason/mason.dart";
+import 'package:path/path.dart' as path;
 import "package:recase/recase.dart";
-import 'package:template_utils/file_utils.dart';
+import 'package:template_utils/template_utils.dart';
 
 Future<void> run(HookContext context) async {
-  final appPackage = "picnic_app";
-  final rootPath = Directory.current.parent.absolute.path.suffixed(Platform.pathSeparator);
-  final libDir = Directory("${rootPath}lib");
-  final testDir = Directory("${rootPath}test");
+  final rootDir = projectRootDir(context.vars["root_folder_path"] as String? ?? '');
+  final appPackage = await getAppPackage(rootDir);
+  final libDir = rootDir.libDir;
+  final testDir = rootDir.testDir;
 
-  final oldInterfacePath = File("${rootPath}${context.vars["interface_path"]}");
-  final oldImplementationPath = File("${rootPath}${context.vars["implementation_path"]}");
+  final oldInterfacePath = File(path.join(rootDir, context.vars["interface_path"]));
+  final oldImplementationPath = File(path.join(rootDir, context.vars["implementation_path"]));
   if (!oldInterfacePath.existsSync()) {
     throw "Cannot find old repository at ${oldInterfacePath.absolute}";
   }
@@ -20,12 +21,10 @@ Future<void> run(HookContext context) async {
   }
 
   final newFeatureName = (context.vars["new_feature_name"] as String? ?? '').snakeCase;
-  final oldFeatureName = oldInterfacePath.path.contains("lib/features")
-      ? RegExp("lib/features/(.+)/").firstMatch(oldInterfacePath.path)?.group(1) ?? ""
-      : "";
   final newRepositoryName = context.vars["new_repository_name"] as String? ?? "";
   final newRepositoryPrefix = context.vars["new_repository_prefix"] as String? ?? '';
 
+  final oldFeatureName = oldInterfacePath.path.featureName;
   final oldInterfaceFileName = oldInterfacePath.fileNameWithExtension;
   final oldImplementationFileName = oldImplementationPath.fileNameWithExtension;
 
@@ -36,59 +35,34 @@ Future<void> run(HookContext context) async {
       ? oldImplementationFileName
       : "${newRepositoryPrefix.snakeCase}_$newInterfaceFileName";
 
-  final newInterfacePath = File(newFeatureName.isEmpty
-      ? '${rootPath}lib/core/domain/repositories/$newInterfaceFileName'
-      : '${rootPath}lib/features/${newFeatureName.snakeCase}/domain/repositories/$newInterfaceFileName');
+  final newInterfacePath = File(
+    newFeatureName.isEmpty
+        ? path.join(libDir, 'core/domain/repositories/$newInterfaceFileName')
+        : path.join(libDir, 'features/${newFeatureName.snakeCase}/domain/repositories/$newInterfaceFileName'),
+  );
 
-  final newImplementationPath = File(newFeatureName.isEmpty
-      ? '${rootPath}lib/core/data/$newImplementationFileName'
-      : '${rootPath}lib/features/${newFeatureName.snakeCase}/data/$newImplementationFileName');
+  final newImplementationPath = File(
+    newFeatureName.isEmpty
+        ? path.join(libDir, 'core/data/$newImplementationFileName')
+        : path.join(libDir, 'features/${newFeatureName.snakeCase}/data/$newImplementationFileName'),
+  );
 
   final oldInterfaceName = oldInterfaceFileName.removedFileExtension.pascalCase;
   final oldImplementationName = oldImplementationFileName.removedFileExtension.pascalCase;
   final newInterfaceName = newInterfaceFileName.removedFileExtension.pascalCase;
   final newImplementationName = newImplementationFileName.removedFileExtension.pascalCase;
 
-  final oldInterfacePackage = "package:$appPackage${oldInterfacePath.relativePathTo(libDir)}";
-  final oldImplementationPackage = "package:$appPackage${oldImplementationPath.relativePathTo(libDir)}";
+  final oldInterfacePackage = "package:$appPackage/${libDir.relativePathTo(oldInterfacePath.path)}";
+  final oldImplementationPackage = "package:$appPackage/${libDir.relativePathTo(oldImplementationPath.path)}";
   final oldVariableName = oldInterfaceName.camelCase;
-  final newInterfacePackage = "package:$appPackage${newInterfacePath.relativePathTo(libDir)}";
-  final newImplementationPackage = "package:$appPackage${newImplementationPath.relativePathTo(libDir)}";
+  final newInterfacePackage = "package:$appPackage/${libDir.relativePathTo(newInterfacePath.path)}";
+  final newImplementationPackage = "package:$appPackage/${libDir.relativePathTo(newImplementationPath.path)}";
   final newVariableName = newInterfaceName.camelCase;
 
-  final oldMockClass = "class Mock$oldInterfaceName extends Mock implements $oldInterfaceName {}";
-  final oldMockStaticField = "static late Mock$oldInterfaceName $oldVariableName;";
-  final oldMockStaticFieldInit = "$oldVariableName = Mock$oldInterfaceName();";
-  final oldMockFallback = "registerFallbackValue(Mock$oldInterfaceName());";
-  final newMockClass = """
-  class Mock$newInterfaceName extends Mock implements $newInterfaceName {}
-  //DO-NOT-REMOVE REPOSITORIES_MOCK_DEFINITION
-  """;
-
-  final newMockImport = """
-  import "$newInterfacePackage";
-  //DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS
-  """;
-
-  final newMockStaticField = """
-  static late Mock$newInterfaceName $newVariableName;
-  //DO-NOT-REMOVE REPOSITORIES_MOCKS_STATIC_FIELD
-  """;
-
-  final newMockStaticFieldInit = """
-  $newVariableName = Mock$newInterfaceName();
-  //DO-NOT-REMOVE REPOSITORIES_INIT_MOCKS
-  """;
-
-  final newMockFallback = """
-  registerFallbackValue(Mock$newInterfaceName());
-  //DO-NOT-REMOVE REPOSITORIES_MOCK_FALLBACK_VALUE
-  """;
-
   try {
-    final oldMocksFile = mocksFilePath(oldFeatureName);
+    final oldMocksFile = mocksFilePath(feature: oldFeatureName, rootDir: rootDir);
     final oldMocksFileClass = File(oldMocksFile).fileNameWithoutExtension.pascalCase;
-    final newMocksFile = mocksFilePath(newFeatureName);
+    final newMocksFile = mocksFilePath(feature: newFeatureName, rootDir: rootDir);
     final newMocksFileClass = File(newMocksFile).fileNameWithoutExtension.pascalCase;
 
     Future<void> replaceInAllFiles(Stream<File> files) async {
@@ -98,7 +72,8 @@ Future<void> run(HookContext context) async {
         await multiReplaceAllInFile(
           filePath: file.absolute.path,
           replacements: [
-            StringReplacement.string(from: oldMockClass, to: '', failIfNotFound: false),
+            StringReplacement.string(
+                from: templateMockClassDefinition(oldInterfaceName), to: '', failIfNotFound: false),
             StringReplacement(
               from: "$oldMocksFileClass.$oldVariableName",
               to: (match) {
@@ -107,9 +82,9 @@ Future<void> run(HookContext context) async {
               },
               failIfNotFound: false,
             ),
-            StringReplacement.string(from: oldMockStaticField, to: '', failIfNotFound: false),
-            StringReplacement.string(from: oldMockStaticFieldInit, to: '', failIfNotFound: false),
-            StringReplacement.string(from: oldMockFallback, to: '', failIfNotFound: false),
+            StringReplacement.string(from: templateMockStaticField(oldInterfaceName), to: '', failIfNotFound: false),
+            StringReplacement.string(from: templateMockFieldInit(oldInterfaceName), to: '', failIfNotFound: false),
+            StringReplacement.string(from: templateRegisterFallback(oldInterfaceName), to: '', failIfNotFound: false),
             StringReplacement.string(from: oldImplementationName, to: newImplementationName, failIfNotFound: false),
             StringReplacement.string(from: oldInterfaceName, to: newInterfaceName, failIfNotFound: false),
             StringReplacement.string(from: oldVariableName, to: newVariableName, failIfNotFound: false),
@@ -143,23 +118,38 @@ Future<void> run(HookContext context) async {
     await oldInterfacePath.rename(newInterfacePath.absolute.path);
     await oldImplementationPath.rename(newImplementationPath.absolute.path);
 
-    await replaceInAllFiles(libDir.allDartFiles);
-    await replaceInAllFiles(testDir.allDartFiles);
+    await replaceInAllFiles(Directory(libDir).allDartFiles);
+    await replaceInAllFiles(Directory(testDir).allDartFiles);
 
-    await ensureFeaturesFile(appPackage: appPackage, featureName: newFeatureName);
+    await ensureFeaturesFile(appPackage: appPackage, featureName: newFeatureName, rootDir: rootDir);
     await multiReplaceAllInFile(
-      filePath: mockDefinitionsFilePath(newFeatureName),
+      filePath: mockDefinitionsFilePath(feature: newFeatureName, rootDir: rootDir),
       replacements: [
-        StringReplacement.string(from: "//DO-NOT-REMOVE REPOSITORIES_MOCK_DEFINITION", to: newMockClass),
-        StringReplacement.string(from: "//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS", to: newMockImport),
+        StringReplacement.prepend(
+          before: "//DO-NOT-REMOVE REPOSITORIES_MOCK_DEFINITION",
+          text: templateMockClassDefinition(newInterfaceName),
+        ),
+        StringReplacement.prepend(
+          before: "//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS",
+          text: templateImport(newInterfacePackage),
+        ),
       ],
     );
     await multiReplaceAllInFile(
       filePath: newMocksFile,
       replacements: [
-        StringReplacement.string(from: "//DO-NOT-REMOVE REPOSITORIES_MOCKS_STATIC_FIELD", to: newMockStaticField),
-        StringReplacement.string(from: "//DO-NOT-REMOVE REPOSITORIES_INIT_MOCKS", to: newMockStaticFieldInit),
-        StringReplacement.string(from: "//DO-NOT-REMOVE REPOSITORIES_MOCK_FALLBACK_VALUE", to: newMockFallback),
+        StringReplacement.prepend(
+          before: "//DO-NOT-REMOVE REPOSITORIES_MOCKS_STATIC_FIELD",
+          text: templateMockStaticField(newInterfaceName),
+        ),
+        StringReplacement.prepend(
+          before: "//DO-NOT-REMOVE REPOSITORIES_INIT_MOCKS",
+          text: templateMockFieldInit(newInterfaceName),
+        ),
+        StringReplacement.prepend(
+          before: "//DO-NOT-REMOVE REPOSITORIES_MOCK_FALLBACK_VALUE",
+          text: templateRegisterFallback(newInterfaceName),
+        ),
       ],
     );
   } catch (ex, stack) {
