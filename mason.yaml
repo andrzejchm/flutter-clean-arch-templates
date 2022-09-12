@@ -9,3 +9,5 @@ bricks:
     path: move_repository
   move_page:
     path: move_page
+  project:
+    path: project

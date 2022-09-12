@@ -5,9 +5,9 @@ environment:
 
 dependencies:
   template_utils:
-    git:
-      url: https://github.com/andrzejchm/flutter-clean-arch-templates.git
-      path: template_utils
-      ref: 'main'
+      git:
+        url: https://github.com/andrzejchm/flutter-clean-arch-templates.git
+        path: template_utils
+        ref: 'main'
   mason: any
   recase: 4.0.0

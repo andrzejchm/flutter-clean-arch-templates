@@ -6,23 +6,19 @@ import 'package:template_utils/replacements_utils.dart';
 
 Future<void> renameTpe({
   required String rootPath,
-  required String oldFilePath,
-  required String newFilePath,
-  required String newTypeName,
-  required String oldTypeName,
+  required RenameParams renameParams,
 }) async {
-  File(newFilePath).parent.createSync(recursive: true);
-  File(oldFilePath).renameSync(newFilePath);
-  final oldFeatureName = oldFilePath.featureName;
-  final newFeatureName = newFilePath.featureName;
-  final oldTypeName = oldFilePath.classNameFromFile;
-  final newTypeName = newFilePath.classNameFromFile;
+  File(renameParams.newFilePath).parent.createSync(recursive: true);
+  File(renameParams.oldFilePath).renameSync(renameParams.newFilePath);
+  final oldFeatureName = renameParams.oldFilePath.featureName;
+  final newFeatureName = renameParams.newFilePath.featureName;
+  final oldTypeName = renameParams.oldFilePath.classNameFromFile;
+  final newTypeName = renameParams.newFilePath.classNameFromFile;
   final oldMocksFile = mocksFilePath(feature: oldFeatureName, rootDir: rootPath);
   final newMocksFile = mocksFilePath(feature: newFeatureName, rootDir: rootPath);
   final appPackage = await getAppPackage(rootPath);
   var oldVariableName = oldTypeName.camelCase;
   var newVariableName = newTypeName.camelCase;
-  print("STARTING REPLACING IN FILES");
   await for (final file in allProjectDartFiles(rootDir: rootPath)) {
     var hasMockMatch = false;
     await replaceAllInFileLineByLine(filePath: file.path, replacements: [
@@ -66,13 +62,13 @@ Future<void> renameTpe({
       ),
       // replace all import paths
       StringReplacement.string(
-        from: oldFilePath.importPath(rootPath, appPackage: appPackage),
-        to: newFilePath.importPath(rootPath, appPackage: appPackage),
+        from: renameParams.oldFilePath.importPath(rootPath, appPackage: appPackage),
+        to: renameParams.newFilePath.importPath(rootPath, appPackage: appPackage),
         failIfNotFound: false,
       ),
+      ...renameParams.additionalReplacements,
     ]);
     if (oldFeatureName != newFeatureName && hasMockMatch) {
-      print("REPLACING MOCK MATCHES");
       // adds new mocks file import to the file only if the old mock was used in the file (i.e: `Mocks.authRepository`)
       await replaceAllInFileLineByLine(
         filePath: file.absolute.path,
@@ -89,24 +85,17 @@ Future<void> renameTpe({
       );
     }
   }
-  print("DONE REPLACING IN FILES");
   final newFeatureComponentPath = featureComponentFilePath(feature: newFeatureName, rootDir: rootPath);
   final oldFeatureComponentPath = featureComponentFilePath(feature: oldFeatureName, rootDir: rootPath);
-  print("OLD COMPONENT PATH: $oldFeatureComponentPath");
-  print("NEW COMPONENT PATH: $newFeatureComponentPath");
-  print("COMPONENT EXISTS: ${File(newFeatureComponentPath).existsSync()}");
   if (newFeatureComponentPath != oldFeatureComponentPath && File(newFeatureComponentPath).existsSync()) {
-    print("REPLACING FACTORIES...");
     final factories = <String, String>{};
 
     /// remove old factories
     var regex = getItFactoryRegex(newTypeName);
-    print("looking for factory: $regex ...");
     await replaceAllInFileAtOnce(filePath: oldFeatureComponentPath, replacements: [
       StringReplacement(
         from: regex,
         to: (match) {
-          print("FOUND MATCH: ${match[1]}");
           final allGroups = match.groups(List.generate(match.groupCount, (index) => index + 1));
 
           /// retrieves '//DO-NOT-REMOVE' comment before which the factory was registered
@@ -133,4 +122,19 @@ Future<void> renameTpe({
           .toList(),
     );
   }
+}
+
+class RenameParams {
+  final String oldFilePath;
+  final String newFilePath;
+  final String oldTypeName;
+  final String newTypeName;
+  final List<StringReplacement> additionalReplacements;
+
+  RenameParams.fromFilePaths({
+    required this.oldFilePath,
+    required this.newFilePath,
+    this.additionalReplacements = const [],
+  })  : oldTypeName = oldFilePath.classNameFromFile,
+        newTypeName = newFilePath.classNameFromFile;
 }

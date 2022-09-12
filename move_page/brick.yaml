@@ -24,23 +24,31 @@ vars:
   root_folder_path:
     type: string
     description: root folder path to project where main pubspec.yaml is located
-    default: /Users/andrzejchm/Developer/project-name
+    #TODO remove default
+    default: /Users/andrzejchm/Developer/picnic-zone/picnic-app-greenfield/
     prompt: "ABSOLUTE path to project's root directory: "
 
   page_path:
     type: string
     description: path to the old page
-    default: lib/features/onboarding/o/auth_page.dart
-    prompt: "path to current page's interface"
-
-  new_feature_name:
-    type: string
-    default: identity # TODO REMOVE DEFAULT VALUE
-    description: "What is the name of the feature? Leave blank if it should be in core package"
-    prompt: "Feature name (in snake_case), leave blank if it should be in 'core' package: "
+    #TODO remove default
+    default: /Users/andrzejchm/Developer/picnic-zone/picnic-app-greenfield/lib/features/onboarding/username_form/username_form_page.dart
+    prompt: "path to current page's file"
 
   new_page_name:
     type: string
-    default: IdentityRepository # TODO REMOVE DEFAULT VALUE
-    description: "new name of the page, leave empty if you don't want to rename it"
-    prompt: "New page name (i.e: IdentityRepository) (leave blank if you don't want to rename): "
+    description: "New Page name"
+    default: "Circle Details"
+    prompt: "new page's name: "
+
+  new_feature_name:
+    type: string
+    description: "What is the name of the feature?"
+    default: "circles"
+    prompt: "(OPTIONAL) new Feature name (in snake_case):"
+
+  new_subdirectory:
+    type: string
+    default: "sub" #TODO remove this
+    description: "subdirectory name inside the feature (OPTIONAL)"
+    prompt: "(OPTIONAL) new subdirectory name inside the new feature : "

@@ -1,7 +1,11 @@
 import 'package:recase/recase.dart';
 import 'package:template_utils/file_utils.dart';
 
-String templateMockClassDefinition(String className) => "class Mock$className extends Mock implements $className {}";
+String templateMockClassDefinition(
+  String className, {
+  String? mockType,
+}) =>
+    "class Mock$className extends ${mockType ?? "Mock"} implements $className {}";
 
 String templateImport(String package, {String as = '', bool relative = false}) {
   var pkg = relative //

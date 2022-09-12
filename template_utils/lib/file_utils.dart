@@ -9,9 +9,9 @@ import 'package:template_utils/feature_templates.dart';
 import 'package:template_utils/template_utils.dart';
 
 extension FileUtils on File {
-  String get fileNameWithExtension => path.substring(path.lastIndexOf(Platform.pathSeparator) + 1);
+  String get fileNameWithExtension => path.fileNameWithExtension;
 
-  String get fileNameWithoutExtension => fileNameWithExtension.removedFileExtension;
+  String get fileNameWithoutExtension => path.fileNameWithoutExtension;
 
   String relativePathTo(String path) => this.absolute.path.relativePathTo(path);
 }
@@ -33,6 +33,11 @@ Stream<File> allFilesInDir(String path) {
 }
 
 extension StringUtils on String {
+
+  String get fileNameWithExtension => substring(lastIndexOf(Platform.pathSeparator) + 1);
+
+  String get fileNameWithoutExtension => fileNameWithExtension.removedFileExtension;
+
   String suffixed(String suffix) {
     if (endsWith(suffix)) {
       return this;
@@ -143,7 +148,7 @@ Future<void> ensureFeatureComponentFile({
   }
 }
 
-Future<void> ensureFeaturesFile({
+Future<void> ensureFeaturesFiles({
   required String appPackage,
   required String featureName,
   required String rootDir,

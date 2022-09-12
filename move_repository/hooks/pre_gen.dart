@@ -46,15 +46,12 @@ Future<void> run(HookContext context) async {
           : path.join(libDir, 'features/${newFeatureName.snakeCase}/data/$newImplementationFileName'),
     );
 
-    final oldInterfaceName = oldInterfaceFileName.classNameFromFile;
-    final oldImplementationName = oldImplementationFileName.classNameFromFile;
     final newInterfaceName = newInterfaceFileName.classNameFromFile;
-    final newImplementationName = newImplementationFileName.classNameFromFile;
 
     final newInterfacePackage = "package:$appPackage/${libDir.relativePathTo(newInterfacePath.path)}";
 
     final newMocksFile = mocksFilePath(feature: newFeatureName, rootDir: rootDir);
-    await ensureFeaturesFile(appPackage: appPackage, featureName: newFeatureName, rootDir: rootDir);
+    await ensureFeaturesFiles(appPackage: appPackage, featureName: newFeatureName, rootDir: rootDir);
 
     ///remove imports from old feature_component file
     await replaceAllInFileLineByLine(
@@ -73,17 +70,17 @@ Future<void> run(HookContext context) async {
     );
     await renameTpe(
       rootPath: rootDir,
-      oldFilePath: oldImplementationPath.path,
-      newFilePath: newImplementationPath.path,
-      newTypeName: newImplementationName,
-      oldTypeName: oldImplementationName,
+      renameParams: RenameParams.fromFilePaths(
+        oldFilePath: oldImplementationPath.path,
+        newFilePath: newImplementationPath.path,
+      ),
     );
     await renameTpe(
       rootPath: rootDir,
-      oldFilePath: oldInterfacePath.path,
-      newFilePath: newInterfacePath.path,
-      newTypeName: newInterfaceName,
-      oldTypeName: oldInterfaceName,
+      renameParams: RenameParams.fromFilePaths(
+        oldFilePath: oldInterfacePath.path,
+        newFilePath: newInterfacePath.path,
+      ),
     );
 
     ///add new imports to feature_component file

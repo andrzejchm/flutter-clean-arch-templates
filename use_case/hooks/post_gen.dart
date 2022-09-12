@@ -61,7 +61,7 @@ Future<void> _replaceInAppComponent({
   required String rootDir,
 }) async {
   await ensureFeatureComponentFile(appPackage: appPackage, feature: feature, rootDir: rootDir);
-  await replaceAllInFile(
+  await replaceAllInFileLineByLine(
     filePath: featureComponentFilePath(feature: feature, rootDir: rootDir),
     replacements: [
       StringReplacement.prepend(
@@ -88,7 +88,7 @@ Future<void> _replaceInMockDefinitions({
   required String rootDir,
 }) async {
   await ensureMockDefinitionsFile(feature: feature, context: context, rootDir: rootDir);
-  await replaceAllInFile(
+  await replaceAllInFileLineByLine(
     filePath: mockDefinitionsFilePath(feature: feature, rootDir: rootDir),
     replacements: [
       StringReplacement.prepend(
@@ -118,7 +118,7 @@ Future<void> _replaceInMocks({
 }) async {
   await ensureMocksFile(feature: feature, rootDir: rootDir);
 
-  await replaceAllInFile(
+  await replaceAllInFileLineByLine(
     filePath: mocksFilePath(feature: feature, rootDir: rootDir),
     replacements: [
       StringReplacement.prepend(

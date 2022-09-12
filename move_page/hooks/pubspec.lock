@@ -137,11 +137,9 @@ packages:
   template_utils:
     dependency: "direct main"
     description:
-      path: template_utils
-      ref: main
-      resolved-ref: c78f1690bc2f56d5a3c3c3cad0ebffc17197e5fb
-      url: "https://github.com/andrzejchm/flutter-clean-arch-templates.git"
-    source: git
+      path: "/Users/andrzejchm/Developer/andrzejchm/flutter-clean-arch-templates/template_utils"
+      relative: false
+    source: path
     version: "1.0.0"
   term_glyph:
     dependency: transitive
