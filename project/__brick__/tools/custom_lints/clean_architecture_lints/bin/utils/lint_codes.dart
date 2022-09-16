@@ -2,6 +2,7 @@ class LintCodes {
   static const forbiddenImportInPresentation = 'forbidden_import_in_presentation';
   static const forbiddenImportInDomain = 'forbidden_import_in_domain';
   static const missingCopyWithMethod = 'missing_copy_with_method';
+  static const invalidFolderStructure = 'invalid_folder_structure';
   static const missingEquatable = 'missing_equatable';
   static const missingPropsItems = 'missing_props_items';
   static const nonFinalFieldInDomainEntity = 'non_final_field_in_domain_entity';
@@ -14,4 +15,5 @@ class LintCodes {
   static const tooManyPageElements = 'too_many_page_file_members';
   static const noDateTimeNow = 'no_date_time_now';
   static const presentationModelStructure = 'presentation_model_structure';
+  static const nullableFieldInDomainEntity = 'nullable_field_in_domain_entity';
 }

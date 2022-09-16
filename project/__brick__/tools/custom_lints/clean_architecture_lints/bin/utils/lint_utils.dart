@@ -81,6 +81,12 @@ extension LibraryElementExtensions on Element {
 
   bool get isDomainEntityFile => library?.source.fullName.contains("domain/model") ?? false;
 
+  bool get isTestFile => library?.source.fullName.contains("/test/") ?? false;
+
+  bool get isDomainFile => !isTestFile && (library?.source.fullName.contains("/domain/") ?? false);
+
+  bool get isDataFile => !isTestFile && (library?.source.fullName.contains("/data/") ?? false);
+
   bool get isFailureFile => library?.source.shortName.endsWith("failure.dart") ?? false;
 
   List<ClassElement> get domainEntitiesClasses =>

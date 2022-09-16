@@ -5,12 +5,14 @@ import '../utils/lint_codes.dart';
 
 /// prevents from using `DateTime.now` anywhere in the code
 class DontUseDateTimeNowLint extends PluginBase {
+  //ignore: no_date_time_now
   final forbiddenText = "DateTime.now()";
 
   @override
   Stream<Lint> getLints(ResolvedUnitResult unit) async* {
     final library = unit.libraryElement;
     final source = library.source.contents.data;
+
     var index = 0;
     final locations = <LintLocation>[];
     while (index != -1) {
