@@ -23,6 +23,7 @@ analyzer:
   strong-mode:
     implicit-dynamic: true
   errors:
+    directives_ordering: ignore #this is handled by import_sorter package
     invalid_annotation_target: error
     argument_type_not_assignable: error
     field_initializer_not_assignable: error

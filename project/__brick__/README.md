@@ -12,7 +12,7 @@
 
 # {{{app_name}}}
 
-Flutter project for the {{{app_name}}}
+Flutter project for {{{app_name}}}
 
 <!-- TOC -->
 
@@ -279,7 +279,6 @@ scripts inside `tools/fastlane` folder. To understand more about what can be don
 
 | Rule                                                           | Explanation                                                                                                                                                                                                                                                                  |
 |----------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Add proper prefix to the PR title (`feat:`, `fix:`, `chore:` , `refactor:`)**                                               | [Link](https://www.conventionalcommits.org/en/v1.0.0/)                                                                                                                                                                                                                       |
 | **Review your own PR first**                                   | Reading trough your own pr helps spot obvious errors and it saves time for the reviewer                                                                                                                                                                                      |
 | **Make sure all CI checks pass**                               | CI is meant to catch formatting and lint errors, make use of that and don't force others to do the machine's job :)                                                                                                                                                          |
 | **Run the app and test it yourself**                           | Before reviewing a PR or when issuing your own code, make sure to run the app and test it making sure the code doesn't break anything and works correctly                                                                                                                    |
