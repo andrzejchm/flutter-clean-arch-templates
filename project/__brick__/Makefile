@@ -22,5 +22,5 @@ check:
 	@echo "\033[32m Code metrics check-unused-code: \033[0m"
 	@fvm flutter pub run dart_code_metrics:metrics check-unused-code . --fatal-unused
 	@echo "\033[32m Code metrics check-unused-files: \033[0m"
-	@fvm flutter pub run dart_code_metrics:metrics check-unused-files . --fatal-unused --exclude="{templates/**,.dart_tool/**,lib/generated/**}"
+	@fvm flutter pub run dart_code_metrics:metrics check-unused-files . --fatal-unused --exclude="{tools/**,.dart_tool/**,lib/generated/**}"
 	@echo "\033[1;32m \n\nGOOD JOB, THE CODE IS SPOTLESS CLEAN AND READY FOR PULL REQUEST! \n \033[42m Make sure to commit any code changes \033[0m  \n\n"

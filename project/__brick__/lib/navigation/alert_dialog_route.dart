@@ -1,3 +1,4 @@
+// ignore_for_file: unused-code, unused-files
 import 'package:flutter/material.dart';
 import 'package:{{{app_package_name}}}/localization/app_localizations_utils.dart';
 import 'package:{{{app_package_name}}}/navigation/app_navigator.dart';

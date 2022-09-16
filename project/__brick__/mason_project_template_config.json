@@ -1,0 +1,6 @@
+{
+  "app_package_name": "{{{app_package_name}}}",
+  "android_application_id": "{{{android_application_id}}}",
+  "ios_bundle_id": "{{{ios_bundle_id}}}",
+  "app_name": "{{{app_name}}}"
+}
