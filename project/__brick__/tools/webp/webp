@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+
+if [ "$#" -ne 3 ]; then
+    echo "Usage: ./webp <filename.svg> <width> <height>"
+    exit
+fi
+
+
+filename=$( basename $1 .svg )
+
+width=$(( $2 ))
+height=$(( $3 ))
+
+width2x=$(( $2 * 2))
+height2x=$(( $3 * 2))
+
+width3x=$(( $2 * 3))
+height3x=$(( $3 * 3))
+
+mkdir -p 2.0x
+mkdir -p 3.0x
+
+rsvg-convert -w $width -h $height $filename.svg -o $filename.png
+rsvg-convert -w $width2x -h $height2x $filename.svg -o ${filename}_2x.png
+rsvg-convert -w $width3x -h $height3x $filename.svg -o ${filename}_3x.png
+
+cwebp $filename.png -o $filename.webp
+cwebp ${filename}_2x.png -o 2.0x/$filename.webp
+cwebp ${filename}_3x.png -o 3.0x/$filename.webp
+
+rm -rf ${filename}_3x.png
+rm -rf ${filename}_2x.png
+rm -rf $filename.png
+
+mv 2.0x/* ../../assets/images/2.0x
+mv 3.0x/* ../../assets/images/3.0x
+mv $filename.webp ../../assets/images/
+rm -rf 2.0x
+rm -rf 3.0x
