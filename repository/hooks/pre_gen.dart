@@ -1,5 +1,5 @@
-import "package:mason/mason.dart";
-import "package:recase/recase.dart";
+import 'package:mason/mason.dart';
+import 'package:recase/recase.dart';
 import 'package:template_utils/template_utils.dart';
 
 Future<void> run(HookContext context) async {

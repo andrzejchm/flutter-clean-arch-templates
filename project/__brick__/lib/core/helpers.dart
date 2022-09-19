@@ -8,14 +8,14 @@ T? doNothing<T>() {
   return null;
 }
 
-/// shows dialog with "not implemented" message. its var so that it can be replaced for tests
+/// shows dialog with 'not implemented' message. its var so that it can be replaced for tests
 void Function({BuildContext? context, String? message}) notImplemented = ({String? message, BuildContext? context}) {
   logError(UnimplementedError('not implemented${message == null ? '' : ':\n$message'}'), StackTrace.current);
   showDialog(
     context: context ?? AppNavigator.navigatorKey.currentContext!,
     builder: (context) => AlertDialog(
       title: const Text('Not implemented'),
-      content: Text(message ?? "This feature is not yet implemented"),
+      content: Text(message ?? 'This feature is not yet implemented'),
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),

@@ -24,7 +24,7 @@ void main() {
   );
 
 
-  test("getIt resolves successfully", () async {
+  test('getIt resolves successfully', () async {
     final useCase = getIt<{{use_case_name}}>();
     expect(useCase, isNotNull);
   });

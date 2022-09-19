@@ -1,6 +1,6 @@
 import 'package:recase/recase.dart';
 
-String featureMockDefinitionsTemplate = """
+String featureMockDefinitionsTemplate = '''
 import 'package:mocktail/mocktail.dart';
 //DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS
 
@@ -17,9 +17,9 @@ import 'package:mocktail/mocktail.dart';
 // STORES
 //DO-NOT-REMOVE STORES_MOCK_DEFINITION
 
-""";
+''';
 
-String featureMocksTemplate(String feature) => """
+String featureMocksTemplate(String feature) => '''
 import 'package:mocktail/mocktail.dart';
 
 import '${feature.snakeCase}_mock_definitions.dart';
@@ -81,9 +81,9 @@ class ${feature.pascalCase}Mocks {
 
   }
 }
-""";
+''';
 
-String featureComponentTemplate(String appPackage) => """
+String featureComponentTemplate(String appPackage) => '''
 import 'package:$appPackage/dependency_injection/app_component.dart';
 //DO-NOT-REMOVE APP_COMPONENT_IMPORTS
 
@@ -135,12 +135,12 @@ void _configureMvp() {
   //DO-NOT-REMOVE MVP_GET_IT_CONFIG
       ;
 }
-""";
+''';
 
-String featurePageTestConfigTemplate = """
+String featurePageTestConfigTemplate = '''
 import 'dart:async';
 
 import '../../../test_utils/test_utils.dart';
 
 Future<void> testExecutable(FutureOr<void> Function() testMain) => preparePageTests(testMain);
-""";
+''';

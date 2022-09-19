@@ -28,7 +28,7 @@ class LogInUseCase {
 
     if (username == 'test' && password == 'test123') {
       final user = User(
-        id: "id_$username",
+        id: 'id_$username',
         username: username,
       );
       _userStore.user = user;

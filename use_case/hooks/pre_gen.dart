@@ -1,6 +1,6 @@
-import "package:mason/mason.dart";
-import "package:recase/recase.dart";
-import "package:template_utils/file_utils.dart";
+import 'package:mason/mason.dart';
+import 'package:recase/recase.dart';
+import 'package:template_utils/file_utils.dart';
 
 Future<void> run(HookContext context) async {
   var useCaseName = (context.vars["use_case_name"] as String? ?? "").trim().pascalCase;

@@ -2,21 +2,21 @@ import 'package:mason/mason.dart';
 import 'package:template_utils/template_utils.dart';
 
 Future<void> run(HookContext context) async {
-  final appPackage = context.vars["app_package"] as String;
-  final importPath = context.vars["import_path"] as String;
-  final pageName = context.vars["page_name"] as String;
-  final presenterName = context.vars["presenter_name"] as String;
-  final presentationModelName = context.vars["presentation_model_name"] as String;
-  final viewModelName = context.vars["view_model_name"] as String;
-  final initialParamsName = context.vars["initial_params_name"] as String;
-  final navigatorName = context.vars["navigator_name"] as String;
-  final navigatorFileName = context.vars["navigator_file_name"] as String;
-  final presentationModelFileName = context.vars["presentation_model_file_name"] as String;
-  final initialParamsFileName = context.vars["initial_params_file_name"] as String;
-  final presenterFileName = context.vars["presenter_file_name"] as String;
-  final pageFileName = context.vars["page_file_name"] as String;
-  final feature = context.vars["feature"] as String;
-  final rootDir = context.vars["root_dir"] as String;
+  final appPackage = context.vars['app_package'] as String;
+  final importPath = context.vars['import_path'] as String;
+  final pageName = context.vars['page_name'] as String;
+  final presenterName = context.vars['presenter_name'] as String;
+  final presentationModelName = context.vars['presentation_model_name'] as String;
+  final viewModelName = context.vars['view_model_name'] as String;
+  final initialParamsName = context.vars['initial_params_name'] as String;
+  final navigatorName = context.vars['navigator_name'] as String;
+  final navigatorFileName = context.vars['navigator_file_name'] as String;
+  final presentationModelFileName = context.vars['presentation_model_file_name'] as String;
+  final initialParamsFileName = context.vars['initial_params_file_name'] as String;
+  final presenterFileName = context.vars['presenter_file_name'] as String;
+  final pageFileName = context.vars['page_file_name'] as String;
+  final feature = context.vars['feature'] as String;
+  final rootDir = context.vars['root_dir'] as String;
 
   await _replaceInMockDefinitions(
     context: context,
@@ -90,22 +90,22 @@ Future<void> _replaceInMockDefinitions({
     filePath: mockDefinitionsFilePath(feature: feature, rootDir: rootDir),
     replacements: [
       StringReplacement.prepend(
-        before: "//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS",
-        text: """
-${templateImport("$appPackage/$importPath/$initialParamsFileName")}
-${templateImport("$appPackage/$importPath/$navigatorFileName")}
-${templateImport("$appPackage/$importPath/$presentationModelFileName")}
-${templateImport("$appPackage/$importPath/$presenterFileName")}
-      """,
+        before: '//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS',
+        text: '''
+${templateImport('$appPackage/$importPath/$initialParamsFileName')}
+${templateImport('$appPackage/$importPath/$navigatorFileName')}
+${templateImport('$appPackage/$importPath/$presentationModelFileName')}
+${templateImport('$appPackage/$importPath/$presenterFileName')}
+      ''',
       ),
       StringReplacement.prepend(
-        before: "//DO-NOT-REMOVE MVP_MOCK_DEFINITION",
-        text: """
+        before: '//DO-NOT-REMOVE MVP_MOCK_DEFINITION',
+        text: '''
 class Mock$presenterName extends MockCubit<$viewModelName> implements $presenterName {}
 ${templateMockClassDefinition(presentationModelName)}
 ${templateMockClassDefinition(initialParamsName)}
 ${templateMockClassDefinition(navigatorName)}
-      """,
+      ''',
       ),
     ],
   );
@@ -126,31 +126,31 @@ Future<void> _replaceInMocks({
     filePath: mocksFilePath(feature: feature, rootDir: rootDir),
     replacements: [
       StringReplacement.prepend(
-        before: "//DO-NOT-REMOVE MVP_MOCKS_STATIC_FIELD",
-        text: """
+        before: '//DO-NOT-REMOVE MVP_MOCKS_STATIC_FIELD',
+        text: '''
   ${templateMockStaticField(presenterName)}
   ${templateMockStaticField(presentationModelName)}
   ${templateMockStaticField(initialParamsName)}
   ${templateMockStaticField(navigatorName)}
-      """,
+      ''',
       ),
       StringReplacement.prepend(
-        before: "//DO-NOT-REMOVE MVP_INIT_MOCKS",
-        text: """
+        before: '//DO-NOT-REMOVE MVP_INIT_MOCKS',
+        text: '''
     ${templateMockFieldInit(presenterName)}
     ${templateMockFieldInit(presentationModelName)}
     ${templateMockFieldInit(initialParamsName)}
     ${templateMockFieldInit(navigatorName)}
-      """,
+      ''',
       ),
       StringReplacement.prepend(
-        before: "//DO-NOT-REMOVE MVP_MOCK_FALLBACK_VALUE",
-        text: """
+        before: '//DO-NOT-REMOVE MVP_MOCK_FALLBACK_VALUE',
+        text: '''
     ${templateRegisterFallback(presenterName)}
     ${templateRegisterFallback(presentationModelName)}
     ${templateRegisterFallback(initialParamsName)}
     ${templateRegisterFallback(navigatorName)}
-      """,
+      ''',
       ),
     ],
   );
@@ -178,46 +178,46 @@ Future<void> _replaceInAppComponent({
     filePath: featureComponentFilePath(feature: feature, rootDir: rootDir),
     replacements: [
       StringReplacement.prepend(
-        before: "//DO-NOT-REMOVE APP_COMPONENT_IMPORTS",
-        text: """
-${templateImport("$appPackage/$importPath/$initialParamsFileName")}
-${templateImport("$appPackage/$importPath/$navigatorFileName")}
-${templateImport("$appPackage/$importPath/$pageFileName")}
-${templateImport("$appPackage/$importPath/$presentationModelFileName")}
-${templateImport("$appPackage/$importPath/$presenterFileName")}
-      """,
+        before: '//DO-NOT-REMOVE APP_COMPONENT_IMPORTS',
+        text: '''
+${templateImport('$appPackage/$importPath/$initialParamsFileName')}
+${templateImport('$appPackage/$importPath/$navigatorFileName')}
+${templateImport('$appPackage/$importPath/$pageFileName')}
+${templateImport('$appPackage/$importPath/$presentationModelFileName')}
+${templateImport('$appPackage/$importPath/$presenterFileName')}
+      ''',
       ),
       StringReplacement.prepend(
-        before: "//DO-NOT-REMOVE MVP_GET_IT_CONFIG",
-        text: """
+        before: '//DO-NOT-REMOVE MVP_GET_IT_CONFIG',
+        text: '''
 ${templateRegisterFactory(
           implementationName: navigatorName,
-          params: ["getIt()"],
+          params: ['getIt()'],
           useConst: false,
         )}
 ${templateRegisterFactoryParam(
           implementationName: presentationModelName,
-          params: ["params"],
+          params: ['params'],
           param1TypeName: initialParamsName,
-          param1varName: "params",
-          constructorName: "initial",
+          param1varName: 'params',
+          constructorName: 'initial',
           useConst: false,
         )}
 ${templateRegisterFactoryParam(
           implementationName: presenterName,
-          params: ["getIt(param1: params)", "getIt()"],
+          params: ['getIt(param1: params)', 'getIt()'],
           param1TypeName: initialParamsName,
-          param1varName: "params",
+          param1varName: 'params',
           useConst: false,
         )}
 ${templateRegisterFactoryParam(
           implementationName: pageName,
-          params: ["presenter: getIt(param1: params)"],
+          params: ['presenter: getIt(param1: params)'],
           param1TypeName: initialParamsName,
-          param1varName: "params",
+          param1varName: 'params',
           useConst: false,
         )}
-      """,
+      ''',
       ),
     ],
   );

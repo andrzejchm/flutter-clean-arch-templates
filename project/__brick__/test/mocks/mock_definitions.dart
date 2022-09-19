@@ -7,6 +7,8 @@ import 'package:{{{app_package_name}}}/core/utils/periodic_task_executor.dart';
 import 'package:{{{app_package_name}}}/navigation/app_navigator.dart';
 import 'package:mocktail/mocktail.dart';
 
+//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS
+
 class MockAppNavigator extends Mock implements AppNavigator {}
 
 //DO-NOT-REMOVE MVP_MOCK_DEFINITION

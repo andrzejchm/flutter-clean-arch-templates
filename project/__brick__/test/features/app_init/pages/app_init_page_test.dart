@@ -37,7 +37,7 @@ Future<void> main() async {
   }
 
   await screenshotTest(
-    "app_init_page",
+    'app_init_page',
     setUp: () async {
       initMvp();
       when(() => AppInitMocks.appInitUseCase.execute()).thenAnswer((_) => successFuture(unit));
@@ -45,7 +45,7 @@ Future<void> main() async {
     pageBuilder: () => page,
   );
 
-  test("getIt page resolves successfully", () async {
+  test('getIt page resolves successfully', () async {
     initMvp();
     final page = getIt<AppInitPage>(param1: initParams);
     expect(page.presenter, isNotNull);

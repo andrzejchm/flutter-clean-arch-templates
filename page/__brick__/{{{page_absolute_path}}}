@@ -24,7 +24,7 @@ class _{{page_name}}State extends State<{{page_name}}> with PresenterStateMixin<
   @override
   Widget build(BuildContext context) => const Scaffold(
       body: Center(
-        child: Text("{{page_name}}\n(NOT IMPLEMENTED YET)"),
+        child: Text('{{page_name}}\n(NOT IMPLEMENTED YET)'),
       ),
     );
 

@@ -1,7 +1,9 @@
 // ignore_for_file: unused-code, unused-files
+
 import 'dart:async';
 
 import 'package:alchemist/alchemist.dart';
+import 'package:{{{app_package_name}}}/ui/theme/{{{app_name_snake}}}_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
 import 'package:meta/meta.dart';
@@ -10,38 +12,40 @@ import 'package:mocktail_image_network/mocktail_image_network.dart';
 import 'golden_test_device_scenario.dart';
 
 final testDevices = [
-  Device.phone.copyWith(name: "small phone"),
-  Device.iphone11.copyWith(name: "iPhone 11"),
+  Device.phone.copyWith(name: 'small phone'),
+  Device.iphone11.copyWith(name: 'iPhone 11'),
 ];
 
 @isTest
 Future<void> screenshotTest(
-  String description, {
-  String variantName = '',
-  bool skip = false,
-  FutureOr<void> Function()? setUp,
-  required Widget Function() pageBuilder,
-  List<String> tags = const ['golden'],
-  List<Device>? devices,
-  Duration timeout = const Duration(seconds: 5),
-}) async {
+    String description, {
+      String variantName = '',
+      bool skip = false,
+      FutureOr<void> Function()? setUp,
+      required Widget Function() pageBuilder,
+      List<String> tags = const ['golden'],
+      List<Device>? devices,
+      Duration timeout = const Duration(seconds: 5),
+    }) async {
   return goldenTest(
     description,
-    fileName: "$description${variantName.trim().isEmpty ? '' : '_$variantName'}",
+    fileName: '$description${variantName.trim().isEmpty ? '' : '_$variantName'}',
     builder: () {
       setUp?.call();
 
       return GoldenTestGroup(
         children: (devices ?? testDevices) //
             .map(
-              (it) => DefaultAssetBundle(
-                bundle: TestAssetBundle(),
-                child: GoldenTestDeviceScenario(
-                  device: it,
-                  builder: pageBuilder,
-                ),
+              (it) => {{{app_name_pascal}}}Theme(
+            child: DefaultAssetBundle(
+              bundle: TestAssetBundle(),
+              child: GoldenTestDeviceScenario(
+                device: it,
+                builder: pageBuilder,
               ),
-            )
+            ),
+          ),
+        )
             .toList(),
       );
     },
@@ -54,23 +58,25 @@ Future<void> screenshotTest(
 
 @isTest
 Future<void> widgetScreenshotTest(
-  String description, {
-  String variantName = '',
-  bool skip = false,
-  FutureOr<void> Function()? setUp,
-  required WidgetBuilder widgetBuilder,
-  List<String> tags = const ['golden'],
-  Duration timeout = const Duration(seconds: 5),
-}) async {
+    String description, {
+      String variantName = '',
+      bool skip = false,
+      FutureOr<void> Function()? setUp,
+      required WidgetBuilder widgetBuilder,
+      List<String> tags = const ['golden'],
+      Duration timeout = const Duration(seconds: 5),
+    }) async {
   return goldenTest(
     description,
-    fileName: "$description${variantName.trim().isEmpty ? '' : '_$variantName'}",
+    fileName: '$description${variantName.trim().isEmpty ? '' : '_$variantName'}',
     builder: () {
       setUp?.call();
 
-      return DefaultAssetBundle(
-        bundle: TestAssetBundle(),
-        child: Builder(builder: widgetBuilder),
+      return {{{app_name_pascal}}}Theme(
+        child: DefaultAssetBundle(
+          bundle: TestAssetBundle(),
+          child: Builder(builder: widgetBuilder),
+        ),
       );
     },
     tags: tags,

@@ -1,7 +1,7 @@
 /// {{activity_path}} - io/appflate/flutter_demo
 import 'dart:io';
 
-import "package:mason/mason.dart";
+import 'package:mason/mason.dart';
 import 'package:recase/recase.dart';
 
 Future<void> run(HookContext context) async {
@@ -10,6 +10,6 @@ Future<void> run(HookContext context) async {
   context.vars['app_name_pascal'] = (context.vars['app_name'] as String).pascalCase;
   context.vars['app_name_snake'] = (context.vars['app_name'] as String).snakeCase;
 
-  print("activity_path: ${context.vars['activity_path']}");
-  print("app_name_pascal: ${context.vars['app_name_pascal']}");
+  print('activity_path: ${context.vars['activity_path']}');
+  print('app_name_pascal: ${context.vars['app_name_pascal']}');
 }

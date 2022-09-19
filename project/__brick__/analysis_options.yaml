@@ -23,6 +23,7 @@ analyzer:
   strong-mode:
     implicit-dynamic: true
   errors:
+    prefer_single_quotes: warning
     directives_ordering: ignore #this is handled by import_sorter package
     invalid_annotation_target: error
     argument_type_not_assignable: error
@@ -39,7 +40,6 @@ analyzer:
     null_aware_in_logical_operator: error
     missing_required_param: error
     implicit_dynamic_map_literal: ignore
-    prefer_single_quotes: ignore
     missing_return: error
     always_declare_return_types: error
     override_on_non_overriding_member: error

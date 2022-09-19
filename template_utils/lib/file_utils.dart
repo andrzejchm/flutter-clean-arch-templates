@@ -21,7 +21,7 @@ Stream<File> allProjectDartFiles({required String rootDir}) {
   return StreamGroup.merge([
     allFilesInDir(rootDir.libDir),
     allFilesInDir(rootDir.testDir),
-  ]).where((event) => event.path.endsWith(".dart"));
+  ]).where((event) => event.path.endsWith('.dart'));
 }
 
 /// all files in given [path] and subdirectories
@@ -33,7 +33,6 @@ Stream<File> allFilesInDir(String path) {
 }
 
 extension StringUtils on String {
-
   String get fileNameWithExtension => substring(lastIndexOf(Platform.pathSeparator) + 1);
 
   String get fileNameWithoutExtension => fileNameWithExtension.removedFileExtension;
@@ -42,7 +41,7 @@ extension StringUtils on String {
     if (endsWith(suffix)) {
       return this;
     } else {
-      return "${this}$suffix";
+      return '${this}$suffix';
     }
   }
 
@@ -50,31 +49,31 @@ extension StringUtils on String {
     if (startsWith(prefix)) {
       return this;
     } else {
-      return "$prefix${this}";
+      return '$prefix${this}';
     }
   }
 
   String importPath(String rootPath, {required String appPackage}) {
     if (contains(rootPath.libDir)) {
-      return "$appPackage/${rootPath.libDir.relativePathTo(this)}";
+      return '$appPackage/${rootPath.libDir.relativePathTo(this)}';
     } else if (contains(rootPath.testDir)) {
-      return "$appPackage/${rootPath.testDir.relativePathTo(this)}";
+      return '$appPackage/${rootPath.testDir.relativePathTo(this)}';
     } else {
-      throw "'$this' is not inside either lib or test folder";
+      throw '\'$this\' is not inside either lib or test folder';
     }
   }
 
   String get classNameFromFile => File(this).fileNameWithoutExtension.pascalCase;
 
-  String get libDir => path_lib.join(projectRootDir(this), "lib");
+  String get libDir => path_lib.join(projectRootDir(this), 'lib');
 
-  String get testDir => path_lib.join(projectRootDir(this), "test");
+  String get testDir => path_lib.join(projectRootDir(this), 'test');
 
-  String get removedFileExtension => substring(0, lastIndexOf("."));
+  String get removedFileExtension => substring(0, lastIndexOf('.'));
 
   String get featureName {
     var absolute = path_lib.absolute(this);
-    return absolute.contains("lib/features") ? RegExp("lib/features/(.+?)/").firstMatch(absolute)?.group(1) ?? "" : "";
+    return absolute.contains('lib/features') ? RegExp('lib/features/(.+?)/').firstMatch(absolute)?.group(1) ?? '' : '';
   }
 
   String relativePathTo(String path) {
@@ -84,7 +83,7 @@ extension StringUtils on String {
 
 extension DartFilesInDir on Directory {
   Stream<File> get allDartFiles =>
-      this.list(recursive: true).where((it) => it is File && it.path.endsWith(".dart")).map((event) => event as File);
+      this.list(recursive: true).where((it) => it is File && it.path.endsWith('.dart')).map((event) => event as File);
 }
 
 String featureComponentFilePath({
@@ -121,7 +120,7 @@ Future<void> ensureFeatureComponentFile({
   required String rootDir,
 }) async {
   var featurePath = featureComponentFilePath(feature: feature, rootDir: rootDir);
-  var filePackage = featurePath.replaceAll("$rootDir/lib/features/", "");
+  var filePackage = featurePath.replaceAll('$rootDir/lib/features/', '');
   final featureFile = File(featurePath);
   final coreFile = File(featureComponentFilePath(rootDir: rootDir, feature: null));
   if (!await featureFile.exists()) {
@@ -131,8 +130,8 @@ Future<void> ensureFeatureComponentFile({
       filePath: coreFile.path,
       replacements: [
         StringReplacement.prepend(
-          before: "//DO-NOT-REMOVE APP_COMPONENT_IMPORTS",
-          text: "${templateImport("$appPackage/features/$filePackage", as: feature ?? '')}",
+          before: '//DO-NOT-REMOVE APP_COMPONENT_IMPORTS',
+          text: '${templateImport('$appPackage/features/$filePackage', as: feature ?? '')}',
         ),
       ],
     );
@@ -140,8 +139,8 @@ Future<void> ensureFeatureComponentFile({
       filePath: coreFile.path,
       replacements: [
         StringReplacement.prepend(
-          before: "//DO-NOT-REMOVE FEATURE_COMPONENT_INIT",
-          text: "$feature.configureDependencies();",
+          before: '//DO-NOT-REMOVE FEATURE_COMPONENT_INIT',
+          text: '$feature.configureDependencies();',
         ),
       ],
     );
@@ -167,8 +166,8 @@ Future<void> ensureMockDefinitionsFile({
   var featurePath = mockDefinitionsFilePath(feature: feature, rootDir: rootDir);
   final featureFile = File(featurePath).absolute;
   final coreFile = File(mockDefinitionsFilePath(feature: null, rootDir: rootDir)).absolute;
-  context?.logger.write("feature mocks file: ${featureFile.path}");
-  context?.logger.write("core file: ${coreFile.path}");
+  context?.logger.write('feature mocks file: ${featureFile.path}');
+  context?.logger.write('core file: ${coreFile.path}');
   if (!await featureFile.exists()) {
     await featureFile.create(recursive: true);
     await writeToFile(filePath: featureFile.path, text: featureMockDefinitionsTemplate);
@@ -183,7 +182,7 @@ Future<void> ensureMocksFile({
   HookContext? context,
 }) async {
   var featurePath = mocksFilePath(feature: feature, rootDir: rootDir);
-  var filePackage = featurePath.replaceAll("$rootDir/test/", "../");
+  var filePackage = featurePath.replaceAll('$rootDir/test/', '../');
   final featureFile = File(featurePath);
   final coreFile = File(mocksFilePath(feature: null, rootDir: rootDir));
   await _ensurePageTestConfigFile(feature);
@@ -194,7 +193,7 @@ Future<void> ensureMocksFile({
       filePath: coreFile.path,
       replacements: [
         StringReplacement.prepend(
-          before: "//DO-NOT-REMOVE IMPORTS_MOCKS",
+          before: '//DO-NOT-REMOVE IMPORTS_MOCKS',
           text: templateImport(filePackage, relative: true),
         ),
       ],
@@ -203,8 +202,8 @@ Future<void> ensureMocksFile({
       filePath: coreFile.path,
       replacements: [
         StringReplacement.prepend(
-          before: "//DO-NOT-REMOVE FEATURE_MOCKS_INIT",
-          text: "${feature.pascalCase}Mocks.init();",
+          before: '//DO-NOT-REMOVE FEATURE_MOCKS_INIT',
+          text: '${feature.pascalCase}Mocks.init();',
         ),
       ],
     );
@@ -228,7 +227,7 @@ Future<void> replaceAllInFileAtOnce({
   required String filePath,
   required List<StringReplacement> replacements,
 }) async {
-  final tmpFilePath = "${filePath}_write_.tmp";
+  final tmpFilePath = '${filePath}_write_.tmp';
   final tmpFile = File(tmpFilePath);
 
   IOSink? writeSink;
@@ -246,8 +245,8 @@ Future<void> replaceAllInFileAtOnce({
     final notFoundReplacements =
         foundReplacementsMap.entries.where((element) => element.key.failIfNotFound && !element.value);
     if (notFoundReplacements.isNotEmpty) {
-      var notFoundReplacementsList = foundReplacementsMap.entries.map((entry) => entry.key.from).join("\n");
-      throw "couldn't find following replacements: $notFoundReplacementsList\n in file: $filePath";
+      var notFoundReplacementsList = foundReplacementsMap.entries.map((entry) => entry.key.from).join('\n');
+      throw 'couldn\'t find following replacements: $notFoundReplacementsList\n in file: $filePath';
     }
   } catch (ex) {
     tmpFile.deleteSync();
@@ -269,7 +268,7 @@ Future<void> replaceAllInFileLineByLine({
   required String filePath,
   required List<StringReplacement> replacements,
 }) async {
-  final tmpFilePath = "${filePath}_write_.tmp";
+  final tmpFilePath = '${filePath}_write_.tmp';
   final tmpFile = File(tmpFilePath);
 
   IOSink? writeSink;
@@ -290,8 +289,8 @@ Future<void> replaceAllInFileLineByLine({
     final notFoundReplacements =
         foundReplacementsMap.entries.where((element) => element.key.failIfNotFound && !element.value);
     if (notFoundReplacements.isNotEmpty) {
-      var notFoundReplacementsList = foundReplacementsMap.entries.map((entry) => entry.key.from).join("\n");
-      throw "couldn't find following replacements: $notFoundReplacementsList\n in file: $filePath";
+      var notFoundReplacementsList = foundReplacementsMap.entries.map((entry) => entry.key.from).join('\n');
+      throw 'couldn\'t find following replacements: $notFoundReplacementsList\n in file: $filePath';
     }
   } catch (ex) {
     tmpFile.deleteSync();
@@ -307,7 +306,7 @@ Future<void> writeToFile({
   required String filePath,
   required String text,
 }) async {
-  final tmpFilePath = "${filePath}_write_.tmp";
+  final tmpFilePath = '${filePath}_write_.tmp';
   final tmpFile = File(tmpFilePath);
 
   try {
@@ -353,7 +352,7 @@ class StringReplacement {
   }) {
     return StringReplacement(
       from: before,
-      to: (_) => "$text\n$before",
+      to: (_) => '$text\n$before',
       failIfNotFound: failIfNotFound,
     );
   }
@@ -365,7 +364,7 @@ class StringReplacement {
   }) {
     return StringReplacement(
       from: after,
-      to: (_) => "$after\n$text",
+      to: (_) => '$after\n$text',
       failIfNotFound: failIfNotFound,
     );
   }
@@ -374,12 +373,12 @@ class StringReplacement {
 /// normalizes root dir of the project specified by [path]
 String projectRootDir(String? path) {
   if (path == null) {
-    throw "Path to project\'s root dir must be specified";
+    throw 'Path to project\'s root dir must be specified';
   }
   var absolutePath = path_lib.absolute(path);
   var directory = Directory(absolutePath);
   if (!directory.existsSync()) {
-    throw "Path '$absolutePath' does not exist!";
+    throw 'Path \'$absolutePath\' does not exist!';
   }
   return absolutePath;
 }
@@ -390,13 +389,13 @@ String relativeRootDir(String rootDirPath) {
 }
 
 /// retrieves app package by reading pubspec.yaml in the [rootPath]
-Future<String> getAppPackage(String rootPath, {String pubspecFileName = "pubspec.yaml"}) async {
-  var pubspecPath = "$rootPath${Platform.pathSeparator}$pubspecFileName";
+Future<String> getAppPackage(String rootPath, {String pubspecFileName = 'pubspec.yaml'}) async {
+  var pubspecPath = '$rootPath${Platform.pathSeparator}$pubspecFileName';
   await for (final line in readFileLines(pubspecPath)) {
-    var regExp = RegExp(r"\s*name:\s*(.*)");
+    var regExp = RegExp(r'\s*name:\s*(.*)');
     if (regExp.hasMatch(line)) {
       return regExp.firstMatch(line)![1]!.trim();
     }
   }
-  throw "Could not find `name: .*` text in $pubspecPath";
+  throw 'Could not find `name: .*` text in $pubspecPath';
 }

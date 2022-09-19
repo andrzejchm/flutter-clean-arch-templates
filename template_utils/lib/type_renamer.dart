@@ -24,8 +24,8 @@ Future<void> renameTpe({
     await replaceAllInFileLineByLine(filePath: file.path, replacements: [
       //Class name
       StringReplacement(
-        from: RegExp("([^a-zA-Z])${oldTypeName}"),
-        to: (match) => "${match.group(1)}${newTypeName}",
+        from: RegExp('([^a-zA-Z])${oldTypeName}'),
+        to: (match) => '${match.group(1)}${newTypeName}',
         failIfNotFound: false,
       ),
       // remove old mocks registration
@@ -36,7 +36,7 @@ Future<void> renameTpe({
           failIfNotFound: false,
         ),
         StringReplacement(
-          from: "${oldMocksFile.classNameFromFile}.$oldVariableName",
+          from: '${oldMocksFile.classNameFromFile}.$oldVariableName',
           to: (match) {
             hasMockMatch = true;
             return '${newMocksFile.classNameFromFile}.${newVariableName}';
@@ -56,8 +56,8 @@ Future<void> renameTpe({
       ],
       // replace all variables
       StringReplacement(
-        from: RegExp("([^a-zA-Z])${oldVariableName}"),
-        to: (match) => "${match.group(1)}${newVariableName}",
+        from: RegExp('([^a-zA-Z])${oldVariableName}'),
+        to: (match) => '${match.group(1)}${newVariableName}',
         failIfNotFound: false,
       ),
       // replace all import paths
@@ -75,10 +75,10 @@ Future<void> renameTpe({
         replacements: [
           StringReplacement(
             from: RegExp('import .*\/${File(oldMocksFile).fileNameWithExtension}.*'),
-            to: (match) => "${match[0]}\n${match[0]?.replaceAll(
-              "/mocks/${File(oldMocksFile).fileNameWithExtension}",
-              "/features/$newFeatureName/mocks/${File(newMocksFile).fileNameWithExtension}",
-            )}",
+            to: (match) => '${match[0]}\n${match[0]?.replaceAll(
+              '/mocks/${File(oldMocksFile).fileNameWithExtension}',
+              '/features/$newFeatureName/mocks/${File(newMocksFile).fileNameWithExtension}',
+            )}',
             failIfNotFound: false,
           ),
         ],
@@ -99,13 +99,13 @@ Future<void> renameTpe({
           final allGroups = match.groups(List.generate(match.groupCount, (index) => index + 1));
 
           /// retrieves '//DO-NOT-REMOVE' comment before which the factory was registered
-          final comment = allGroups.firstWhere((element) => (element ?? '').trim().startsWith(RegExp(r"//\s*DO")))!;
+          final comment = allGroups.firstWhere((element) => (element ?? '').trim().startsWith(RegExp(r'//\s*DO')))!;
 
           /// match[1] contains the factory code
           factories[comment] = match[1]!;
 
           /// remove just factory from result, leaving everything else
-          return allGroups.sublist(1).map((e) => e ?? '').join("");
+          return allGroups.sublist(1).map((e) => e ?? '').join('');
         },
         failIfNotFound: false,
       ),

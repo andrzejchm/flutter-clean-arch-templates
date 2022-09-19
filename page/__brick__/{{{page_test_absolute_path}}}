@@ -16,7 +16,7 @@ Future<void> main() async {
   late {{presenter_name}} presenter;
   late {{navigator_name}} navigator;
 
-  void _initMvp() {
+  void initMvp() {
     initParams = const {{initial_params_name}}();
     model = {{presentation_model_name}}.initial(
       initParams,
@@ -30,15 +30,15 @@ Future<void> main() async {
   }
 
   await screenshotTest(
-    "{{page_name.snakeCase()}}",
+    '{{page_name.snakeCase()}}',
     setUp: () async {
-      _initMvp();
+      initMvp();
     },
     pageBuilder: () => page,
   );
 
-  test("getIt page resolves successfully", () async {
-    _initMvp();
+  test('getIt page resolves successfully', () async {
+    initMvp();
     final page = getIt<{{page_name}}>(param1: initParams);
     expect(page.presenter, isNotNull);
     expect(page, isNotNull);

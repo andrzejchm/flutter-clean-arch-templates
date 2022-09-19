@@ -23,7 +23,7 @@ void main() {
   );
 
   test(
-    "getIt resolves successfully",
+    'getIt resolves successfully',
     () async {
       final useCase = getIt<AppInitUseCase>();
       expect(useCase, isNotNull);
