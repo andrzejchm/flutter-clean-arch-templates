@@ -63,14 +63,14 @@ packages:
       name: mason
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.0-dev.32"
+    version: "0.1.0-dev.33"
   mason_logger:
     dependency: transitive
     description:
       name: mason_logger
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.1.2"
+    version: "0.1.3"
   meta:
     dependency: transitive
     description:
@@ -139,7 +139,7 @@ packages:
     description:
       path: template_utils
       ref: main
-      resolved-ref: "1084c3293e157504f9c1d9532e96e1785e92561c"
+      resolved-ref: a3632eae75c24c9224fa05090522e063938b9f67
       url: "https://github.com/andrzejchm/flutter-clean-arch-templates.git"
     source: git
     version: "1.0.0"
