@@ -9,8 +9,8 @@ class {{page_name}} extends StatefulWidget with HasPresenter<{{presenter_name}}>
 
   const {{page_name}}({
     required this.presenter,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   final {{presenter_name}} presenter;

@@ -6,9 +6,9 @@ import 'package:{{{app_package}}}/{{{import_path}}}/{{{presentation_model_file_n
 class {{presenter_name}} extends Cubit<{{view_model_name}}> {
 
   {{presenter_name}}(
-    {{presentation_model_name}} model,
+    {{presentation_model_name}} super.model,
     this.navigator,
-  ) : super(model);
+  );
 
   final {{navigator_name}} navigator;
 
