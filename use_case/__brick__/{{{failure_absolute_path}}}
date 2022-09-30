@@ -11,7 +11,7 @@ class {{failure_name}} implements HasDisplayableFailure {
   DisplayableFailure displayableFailure() {
     switch (type) {
       case {{failure_name}}Type.unknown:
-        return DisplayableFailure.commonError();
+        return DisplayableFailure.commonError(this);
     }
   }
 

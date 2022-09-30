@@ -1,3 +1,4 @@
+// ignore_for_file: cancel_subscriptions
 import 'dart:async';
 
 import 'package:flutter/widgets.dart';
@@ -31,20 +32,40 @@ mixin HasPresenter<P> on StatefulWidget {
   P get presenter;
 }
 
-mixin CubitToCubitCommunicationMixin<T> on Cubit<T> {
-  final _subscriptions = <StreamSubscription<dynamic>>[];
+mixin SubscriptionsMixin<T> on Cubit<T> {
+  final _subscriptions = <String, StreamSubscription<dynamic>>{};
 
-  void listenTo<C>(Cubit<C> cubit, {required void Function(C) onChange}) =>
-      addSubscription(cubit.stream.listen(onChange));
-
-  void addSubscription(StreamSubscription<dynamic> subscription) {
-    _subscriptions.add(subscription);
+  /// To avoid start listening the same stream twice we have to provide unique [subscriptionId]
+  void listenTo<C>({
+    required Stream<C> stream,
+    required String subscriptionId,
+    required void Function(C) onChange,
+  }) {
+    if (!_subscriptions.containsKey(subscriptionId)) {
+      final subscription = stream.listen(onChange);
+      addSubscription(subscription: subscription, subscriptionId: subscriptionId);
+    }
   }
 
+  void addSubscription({required StreamSubscription<dynamic> subscription, required String subscriptionId}) {
+    _subscriptions.putIfAbsent(subscriptionId, () => subscription);
+  }
+
+  ///Cancel and close single subscriptions
+  Future<void> closeSubscription(String subscriptionId) async {
+    final subscription = _subscriptions[subscriptionId];
+    if (subscription != null) {
+      await subscription.cancel();
+      _subscriptions.remove(subscriptionId);
+    }
+  }
+
+  ///Cancel and close all subscriptions
   @override
   Future<void> close() async {
-    await Future.wait(_subscriptions.map((it) => it.cancel()));
+    await Future.wait(_subscriptions.values.map((it) => it.cancel()));
     await super.close();
     _subscriptions.clear();
   }
 }
+

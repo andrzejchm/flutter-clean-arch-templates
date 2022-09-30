@@ -56,6 +56,9 @@ dev_dependencies:
   bloc_test: 9.1.0
   import_sorter: 4.6.0
 
+  # utils
+  meta: 1.8.0
+
 flutter:
   uses-material-design: true
   generate: true

@@ -1,8 +1,9 @@
+import 'package:get_it/get_it.dart';
 import 'package:{{{app_package_name}}}/core/domain/stores/user_store.dart';
+import 'package:{{{app_package_name}}}/core/utils/current_time_provider.dart';
 import 'package:{{{app_package_name}}}/features/app_init/dependency_injection/feature_component.dart' as app_init;
 import 'package:{{{app_package_name}}}/features/auth/dependency_injection/feature_component.dart' as auth;
 import 'package:{{{app_package_name}}}/navigation/app_navigator.dart';
-import 'package:get_it/get_it.dart';
 //DO-NOT-REMOVE APP_COMPONENT_IMPORTS
 
 final getIt = GetIt.instance;
@@ -27,6 +28,7 @@ void _configureGeneralDependencies() {
         ..registerFactory<AppNavigator>(
           () => AppNavigator(),
         )
+        ..registerFactory(() => const CurrentTimeProvider())
       //DO-NOT-REMOVE GENERAL_DEPS_GET_IT_CONFIG
       ;
 }

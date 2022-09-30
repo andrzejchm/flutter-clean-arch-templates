@@ -53,9 +53,9 @@ analyzer:
     avoid_renaming_method_parameters: error
     avoid_void_async: error
     parameter_assignments: error
-    constant_identifier_names: ignore
+    constant_identifier_names: warning
     unawaited_futures: error
-    non_constant_identifier_names: ignore
+    non_constant_identifier_names: warning
     only_throw_errors: error
     exhaustive_cases: error
     always_use_package_imports: error
