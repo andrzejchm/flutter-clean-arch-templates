@@ -28,7 +28,7 @@ void logError(
 ]) =>
     errorLogger(
       error,
-      stack,
+      stack ?? StackTrace.current,
       reason,
     );
 
