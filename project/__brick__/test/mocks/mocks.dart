@@ -65,7 +65,7 @@ class Mocks {
 
   static void _initFallbacks() {
     //DO-NOT-REMOVE FEATURES_FALLBACKS
-    registerFallbackValue(DisplayableFailure(title: '', message: ''));
+    registerFallbackValue(DisplayableFailure('', title: '', message: ''));
     // MVP
     //DO-NOT-REMOVE MVP_MOCK_FALLBACK_VALUE
 

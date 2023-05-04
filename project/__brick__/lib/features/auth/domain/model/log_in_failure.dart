@@ -14,9 +14,10 @@ class LogInFailure implements HasDisplayableFailure {
   DisplayableFailure displayableFailure() {
     switch (type) {
       case LogInFailureType.unknown:
-        return DisplayableFailure.commonError();
+        return DisplayableFailure.commonError(this);
       case LogInFailureType.missingCredentials:
         return DisplayableFailure(
+          this,
           title: appLocalizations.missingCredsTitle,
           message: appLocalizations.missingCredsMessage,
         );

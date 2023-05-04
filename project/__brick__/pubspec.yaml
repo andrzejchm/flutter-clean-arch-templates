@@ -5,7 +5,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: ">=2.19.6 <3.0.0"
 
 dependencies:
   flutter:
@@ -14,26 +14,26 @@ dependencies:
     sdk: flutter
 
   # architecture
-  bloc: 8.1.0
-  flutter_bloc: 8.1.1
+  bloc: 8.1.1
+  flutter_bloc: 8.1.2
 
   # dependency injection
-  get_it: 7.2.0
+  get_it: 7.4.0
 
   # functional programming, used for Either type
   dartz: 0.10.1
 
   # equality checks
-  equatable: 2.0.3
+  equatable: 2.0.5
 
   # localization
   intl: 0.17.0
 
   # widgets
-  gap: 2.0.0
+  gap: 3.0.0
 
   # logging
-  logger: 1.1.0
+  logger: 1.3.0
 
 
 dev_dependencies:
@@ -41,22 +41,18 @@ dev_dependencies:
     sdk: flutter
 
   # code analysis
-  lint: 1.10.0
-  dart_code_metrics: 4.18.3
-  custom_lint:
-    git:
-      url: https://github.com/andrzejchm/dart_custom_lint.git
-      path: packages/custom_lint
-      ref: main
+  lint: 2.0.1
+  dart_code_metrics: 5.7.2
+  custom_lint: 0.3.4
   clean_architecture_lints:
     path: tools/custom_lints/clean_architecture_lints
 
   # tests
-  golden_toolkit: 0.13.0
-  alchemist: 0.5.0
+  golden_toolkit: 0.15.0
+  alchemist: 0.6.0
   mocktail_image_network: 0.3.1
   mocktail: 0.3.0
-  bloc_test: 9.1.0
+  bloc_test: 9.1.1
   import_sorter: 4.6.0
 
   # utils

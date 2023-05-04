@@ -144,3 +144,4 @@ fabric.properties
 *.iml
 modules.xml
 .idea/inspectionProfiles
+**/hooks/build/**

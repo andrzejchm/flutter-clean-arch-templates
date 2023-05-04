@@ -1,4 +1,4 @@
-include: package:lint/analysis_options.yaml
+include: package:lint/strict.yaml
 
 analyzer:
   plugins:
@@ -160,7 +160,6 @@ dart_code_metrics:
     - prefer-first
     - prefer-last
     - prefer-match-file-name
-    - avoid-use-expanded-as-spacer
     - prefer-extracting-callbacks
     - prefer-async-await
     - prefer-moving-to-variable

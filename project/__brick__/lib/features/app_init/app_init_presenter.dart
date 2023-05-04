@@ -11,7 +11,7 @@ import 'package:{{{app_package_name}}}/core/utils/mvp_extensions.dart';
 import 'package:{{{app_package_name}}}/features/app_init/app_init_navigator.dart';
 import 'package:{{{app_package_name}}}/features/app_init/app_init_presentation_model.dart';
 
-class AppInitPresenter extends Cubit<AppInitViewModel> with CubitToCubitCommunicationMixin<AppInitViewModel> {
+class AppInitPresenter extends Cubit<AppInitViewModel> with SubscriptionsMixin<AppInitViewModel> {
   AppInitPresenter(
     AppInitPresentationModel super.model,
     this.navigator,
@@ -19,7 +19,8 @@ class AppInitPresenter extends Cubit<AppInitViewModel> with CubitToCubitCommunic
     this.userStore,
   ) {
     listenTo<User>(
-      userStore,
+      subscriptionId: 'user',
+      stream: userStore.stream,
       onChange: (user) => emit(_model.copyWith(user: user)),
     );
   }

@@ -6,6 +6,7 @@ import 'package:alchemist/alchemist.dart';
 import 'package:{{{app_package_name}}}/ui/theme/{{{app_name_snake}}}_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:golden_toolkit/golden_toolkit.dart';
+import 'package:{{{app_package_name}}}/core/utils/durations.dart';
 import 'package:meta/meta.dart';
 import 'package:mocktail_image_network/mocktail_image_network.dart';
 

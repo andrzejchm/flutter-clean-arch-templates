@@ -2,7 +2,7 @@ import 'package:{{{app_package_name}}}/core/domain/model/displayable_failure.dar
 
 class AppInitFailure implements HasDisplayableFailure {
   // ignore: avoid_field_initializers_in_const_classes
-  const AppInitFailure.unknown([this.cause]) : type = AppInitFailureType.Unknown;
+  const AppInitFailure.unknown([this.cause]) : type = AppInitFailureType.unknown;
 
   final AppInitFailureType type;
   final Object? cause;
@@ -10,8 +10,8 @@ class AppInitFailure implements HasDisplayableFailure {
   @override
   DisplayableFailure displayableFailure() {
     switch (type) {
-      case AppInitFailureType.Unknown:
-        return DisplayableFailure.commonError();
+      case AppInitFailureType.unknown:
+        return DisplayableFailure.commonError(this);
     }
   }
 
@@ -20,5 +20,5 @@ class AppInitFailure implements HasDisplayableFailure {
 }
 
 enum AppInitFailureType {
-  Unknown,
+  unknown,
 }
