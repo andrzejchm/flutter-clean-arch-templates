@@ -16,6 +16,8 @@ Future<void> main() async {
   late {{presenter_name}} presenter;
   late {{navigator_name}} navigator;
 
+  setUp(() => prepareAppForUnitTests());
+
   void initMvp() {
     initParams = const {{initial_params_name}}();
     model = {{presentation_model_name}}.initial(

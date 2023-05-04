@@ -10,6 +10,9 @@ void main() {
   late {{presenter_name}} presenter;
   late Mock{{navigator_name}} navigator;
 
+
+  setUp(() => prepareAppForUnitTests());
+
   test(
     'sample test',
         () {
