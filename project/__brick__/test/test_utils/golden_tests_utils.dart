@@ -19,51 +19,52 @@ final testDevices = [
 ];
 
 @isTest
-Future<void> screenshotTest(String description, {
-  String variantName = '',
-  bool skip = false,
-  FutureOr<void> Function()? setUp,
-  required Widget Function() pageBuilder,
-  List<String> tags = const ['golden'],
-  List<Device>? devices,
-  Duration timeout = const Duration(seconds: 5),
-}) async {
-  return goldenTest(
-    description,
-    fileName: '$description${variantName
-        .trim()
-        .isEmpty ? '' : '_$variantName'}',
-    builder: () {
-      setUp?.call();
+Future<void> screenshotTest(
+    String description, {
+      String variantName = '',
+      bool skip = false,
+      FutureOr<void> Function()? setUp,
+      required Widget Function() pageBuilder,
+      List<String> tags = const ['golden'],
+      List<Device>? devices,
+      Duration timeout = const Duration(seconds: 5),
+    }) async {
+  return preparePageTests(
+        () => goldenTest(
+      description,
+      fileName: '$description${variantName.trim().isEmpty ? '' : '_$variantName'}',
+      builder: () {
+        setUp?.call();
 
-      return GoldenTestGroup(
-        children: (devices ?? testDevices) //
-            .map(
-                (it) => {{{app_name_pascal}}}Theme(
-            child: DefaultAssetBundle(
-            bundle: TestAssetBundle(),
-        child: GoldenTestDeviceScenario(
-          device: it,
-          builder: pageBuilder,
-        ),
-      ),
-      ),
-      )
-          .toList(),
-      );
-    },
-    tags: tags,
-    skip: skip,
-    pumpBeforeTest: (tester) async {
-      //first round of precaching for images that are available immediately
-      await mockNetworkImages(() => precacheImages(tester));
-      //this will allow all the UI to properly settle before caching images
-      await tester.pump(const LongDuration());
-      //second round of precaching for images that are available a bit later, after first frame
-      return mockNetworkImages(() => precacheImages(tester)).timeout(timeout);
-    },
-    pumpWidget: (tester, widget) => mockNetworkImages(() => tester.pumpWidget(widget)).timeout(timeout),
-  ).timeout(timeout);
+        return GoldenTestGroup(
+          children: (devices ?? testDevices) //
+              .map(
+                (it) => ChatgptPromptsTheme(
+              child: DefaultAssetBundle(
+                bundle: TestAssetBundle(),
+                child: GoldenTestDeviceScenario(
+                  device: it,
+                  builder: pageBuilder,
+                ),
+              ),
+            ),
+          )
+              .toList(),
+        );
+      },
+      tags: tags,
+      skip: skip,
+      pumpBeforeTest: (tester) async {
+        //first round of precaching for images that are available immediately
+        await mockNetworkImages(() => precacheImages(tester));
+        //this will allow all the UI to properly settle before caching images
+        await tester.pump(const LongDuration());
+        //second round of precaching for images that are available a bit later, after first frame
+        return mockNetworkImages(() => precacheImages(tester)).timeout(timeout);
+      },
+      pumpWidget: (tester, widget) => mockNetworkImages(() => tester.pumpWidget(widget)).timeout(timeout),
+    ).timeout(timeout),
+  );
 }
 
 @isTest
