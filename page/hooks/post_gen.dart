@@ -92,6 +92,7 @@ Future<void> _replaceInMockDefinitions({
       StringReplacement.prepend(
         before: '//DO-NOT-REMOVE IMPORTS_MOCK_DEFINITIONS',
         text: '''
+        import 'package:bloc_test/bloc_test.dart';
 ${templateImport('$appPackage/$importPath/$initialParamsFileName')}
 ${templateImport('$appPackage/$importPath/$navigatorFileName')}
 ${templateImport('$appPackage/$importPath/$presentationModelFileName')}

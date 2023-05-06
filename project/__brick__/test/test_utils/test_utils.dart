@@ -21,6 +21,7 @@ Future<void> prepareAppForUnitTests() async {
   isUnitTests = true;
   resetMocktailState();
   Mocks.init();
+  Mock.throwOnMissingStub();
   notImplemented = ({message, context}) => doNothing();
   overrideAppLocalizations(AppLocalizationsEn());
   await configureDependenciesForTests();
